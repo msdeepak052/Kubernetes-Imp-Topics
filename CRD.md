@@ -1,4 +1,4 @@
-Absolutely Deepak! Let's dive **deep** into **CRDs (Custom Resource Definitions)** in Kubernetes.
+## **CRDs (Custom Resource Definitions)** in Kubernetes.
 
 This explanation will include:
 
