@@ -1063,4 +1063,122 @@ watch kubectl get hpa
 ✅ **HPA + Custom Metrics** = **Autoscaling based on real-world needs** (traffic, queues, business logic).  
 
 ---
+To use **Custom Metrics** with HPA and leverage **Istio telemetry**, here's a breakdown:
+
+---
+
+## 1. 📊 Custom Metrics with HPA
+
+* **Install a custom metrics API adapter**
+  Kubernetes’ HPA (v2+) supports custom and external metrics via APIs like `custom.metrics.k8s.io` and `external.metrics.k8s.io`. To expose your app’s metrics (not CPU/memory), you typically deploy an adapter such as **prometheus-adapter** or **kube-metrics-adapter**. These integrate with Prometheus and make its metrics available to HPA ([reece.tech][1], [kubernetes.io][2], [fairwinds.com][3]).
+
+* **Scrape your custom metrics**
+  Export desired metrics from your application (e.g., active WebSocket connections, request count, latency). Prometheus scrapes them, and the adapter exposes them via the Kubernetes Custom Metrics API ([seifrajhi.github.io][4]).
+
+* **Define HPA targeting those metrics**
+
+  Example HPA YAML (for autoscaling based on a custom per-pod metric `requests_per_second`):
+
+  ```yaml
+  apiVersion: autoscaling/v2
+  kind: HorizontalPodAutoscaler
+  spec:
+    scaleTargetRef:
+      apiVersion: apps/v1
+      kind: Deployment
+      name: my-app
+    minReplicas: 2
+    maxReplicas: 10
+    metrics:
+    - type: Pods
+      pods:
+        metric:
+          name: requests_per_second
+        target:
+          type: AverageValue
+          averageValue: "100"
+  ```
+
+  This makes HPA scale pods to maintain \~100 requests/sec per pod ([kubernetes.io][2], [medium.com][5]).
+
+---
+
+## 2. 🚦 Using Istio Telemetry
+
+Istio’s **Envoy sidecars** automatically collect L7 telemetry—such as HTTP request rates, latencies, and status codes—and expose them to Prometheus via the telemetry service or Mixer-complete setups ([medium.com][5]).
+
+Your workflow:
+
+1. **Install Istio** with telemetry enabled (collector, Prometheus config).
+
+2. **Enable Prometheus** to scrape metrics like `istio_requests_total`, `istio_request_duration_seconds`, etc. ([github.com][6], [seifrajhi.github.io][4]).
+
+3. **Deploy adapter** (e.g. Zalando’s kube-metrics-adapter) to expose Prometheus-collected Istio metrics via Kubernetes API:
+
+   ```yaml
+   rules:
+   - seriesQuery: 'istio_requests_total{kubernetes_namespace!="",kubernetes_pod_name!=""}'
+     resources:
+       overrides:
+         kubernetes_namespace: {resource: "namespace"}
+         kubernetes_pod_name: {resource: "pod"}
+     name:
+       matches: "^(.*)_total"
+       as: "${1}_per_second"
+   ```
+
+   This makes `istio_requests_per_second` available ([github.com][6], [seifrajhi.github.io][4]).
+
+4. **Configure HPA** to scale based on these Istio-derived metrics:
+
+   ```yaml
+   metrics:
+   - type: Pods
+     pods:
+       metric:
+         name: istio_requests_per_second
+       target:
+         type: AverageValue
+         averageValue: "50"
+   ```
+
+   Or use latency-based scaling with `istio_request_duration_seconds_90ile`, etc. ([ryo-koike.com][7]).
+
+---
+
+## 3. How Istio Helps
+
+* **Zero instrumentation required**: Istio automatically captures L7 insights via sidecars—no code changes needed ([seifrajhi.github.io][4]).
+* **Rich telemetry**: Metrics like HTTP rates, durations, error rates allow scaling based on real traffic instead of CPU/memory proxies ([haptik.ai][8]).
+* **Traffic-aware autoscaling**: Enables smarter scaling decisions (e.g., scaling up only when latency or RPS exceed thresholds) ([haptik.ai][8]).
+
+---
+
+## 4. 🛠️ Implementation Steps
+
+1. **Deploy Istio** with telemetry and Prometheus scraping enabled.
+2. **Deploy Prometheus** (via Helm or operator) configured to scrape `istio-mesh` metrics ([seifrajhi.github.io][4], [medium.com][5]).
+3. **Install a metrics adapter** (Zalando or Prometheus adapter) to register `/apis/custom.metrics.k8s.io`.
+4. **Write adapter rules** to map Istio metrics (e.g., `istio_requests_total`) to custom metrics API ([seifrajhi.github.io][4]).
+5. **Define HPA (v2)** using those mapped metrics for desired scaling logic.
+6. **Monitor & tune** by validating metrics via `kubectl get --raw /apis/custom.metrics.k8s.io/...`, and iterate HPA thresholds.
+
+---
+
+## TL;DR
+
+* **Custom Metrics + HPA**: Expose metrics via Prometheus → adapter → Custom Metrics API → HPA scales.
+* **Istio Telemetry**: Captures rich L7 insights effortlessly and integrates into Prometheus.
+* **Result**: Autoscales workloads with traffic awareness—based on actual HTTP load/latency instead of CPU/memory.
+
+Let me know if you'd like help crafting sample adapter configs, HPA manifests, or troubleshooting telemetry!
+
+[1]: https://reece.tech/posts/hpa-in-kubernetes-with-custom-metrics/?utm_source=chatgpt.com "Horizontal pod auto-scaling, custom metrics and time-scaling oh my!"
+[2]: https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/?utm_source=chatgpt.com "Horizontal Pod Autoscaling - Kubernetes"
+[3]: https://www.fairwinds.com/blog/kubernetes-hpa-autoscaling-with-custom-and-external-metrics-using-gke-and-stackdriver-metrics?utm_source=chatgpt.com "Kubernetes HPA Autoscaling with Custom and External Metrics"
+[4]: https://seifrajhi.github.io/blog/scaling-kubernetes-istio-metrics-hpa/?utm_source=chatgpt.com "Scaling Kubernetes Workloads with Istio Metrics and the Horizontal ..."
+[5]: https://medium.com/cloudzone/autoscaling-kubernetes-workloads-with-istio-metrics-92f86baabba9?utm_source=chatgpt.com "Autoscaling Kubernetes Workloads with Envoy & Istio Metrics inside ..."
+[6]: https://github.com/stefanprodan/istio-hpa?utm_source=chatgpt.com "stefanprodan/istio-hpa: Configure horizontal pod autoscaling with ..."
+[7]: https://ryo-koike.com/blog/hpa-with-istio-metrics/?utm_source=chatgpt.com "Kubernetes Horizontal Pod Autoscaler (HPA) with Custom Metrics ..."
+[8]: https://www.haptik.ai/tech/elevating-kubernetes-autoscaling-with-istio-metrics?utm_source=chatgpt.com "How We Took Our Kubernetes Autoscaling from Basic to Advanced ..."
 
