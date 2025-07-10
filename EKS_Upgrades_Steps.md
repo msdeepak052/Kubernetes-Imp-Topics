@@ -270,6 +270,138 @@ velero backup create pre-upgrade-backup --include-namespaces '*' --wait
 | Recommended                | ✅ Export YAMLs or use Velero                     |
 
 ---
+If you want to upgrade **Amazon EKS from 1.28 to 1.31**, you **must follow sequential minor version upgrades**, because **EKS does not support skipping Kubernetes versions**.
+
+---
+
+## 🔄 **Upgrade Path: 1.28 → 1.29 → 1.30 → 1.31**
+
+Each upgrade step involves:
+
+* Upgrading **Control Plane**
+* Upgrading **Add-ons**
+* Upgrading **Node Groups**
+
+---
+
+## ✅ **Step-by-Step: Multi-Version EKS Upgrade (1.28 → 1.31)**
+
+---
+
+### 🔁 Repeat the following steps **for each version** (1.28 → 1.29 → 1.30 → 1.31)
+
+---
+
+### 🔷 Step 0: Prep Once
+
+* ✅ Backup resources:
+
+  ```bash
+  kubectl get all --all-namespaces -o yaml > cluster-backup.yaml
+  ```
+* ✅ Optional: Install and configure Velero with S3 for full backup.
+
+---
+
+### 🔷 Step 1: Upgrade Control Plane
+
+**Run this for each version sequentially:**
+
+```bash
+aws eks update-cluster-version \
+  --name my-cluster \
+  --kubernetes-version 1.29 \
+  --region <region>
+```
+
+Repeat for 1.30, then 1.31:
+
+```bash
+aws eks update-cluster-version --name my-cluster --kubernetes-version 1.30
+aws eks update-cluster-version --name my-cluster --kubernetes-version 1.31
+```
+
+---
+
+### 🔷 Step 2: Upgrade Add-ons (after each control plane upgrade)
+
+You must upgrade the following to match the new version:
+
+* VPC CNI (`aws-node`)
+* CoreDNS
+* kube-proxy
+
+With `eksctl`:
+
+```bash
+eksctl utils update-aws-node --cluster my-cluster --approve
+eksctl utils update-coredns --cluster my-cluster --approve
+eksctl utils update-kube-proxy --cluster my-cluster --approve
+```
+
+> Or use `kubectl set image` / `kubectl apply` if you manage YAML manually.
+
+---
+
+### 🔷 Step 3: Upgrade Managed Node Groups (for each version)
+
+```bash
+eksctl upgrade nodegroup \
+  --name <nodegroup-name> \
+  --cluster my-cluster \
+  --kubernetes-version 1.29 \
+  --approve
+```
+
+Repeat for 1.30 and 1.31.
+
+**Or** via AWS Console:
+
+* Go to EKS > Node Group > Update Kubernetes Version
+
+---
+
+### 🔷 Step 4: Validate Workloads
+
+After each upgrade:
+
+* Check if pods are running:
+
+  ```bash
+  kubectl get pods -A
+  ```
+* Monitor:
+
+  * CPU/Memory
+  * Logs
+  * Crash loops or scheduling issues
+
+---
+
+### 🔷 Step 5: Final Clean-up
+
+* Verify everything is healthy:
+
+  ```bash
+  kubectl get nodes
+  kubectl get events -A
+  ```
+* Remove unused node groups (if you created new ones during upgrade).
+
+---
+
+## 🧠 Pro Tips
+
+| Tip                           | Why                    |
+| ----------------------------- | ---------------------- |
+| Upgrade in non-prod first     | Avoid surprises        |
+| Use eksctl                    | Simplifies the process |
+| Watch for deprecated APIs     | Check release notes    |
+| Upgrade one version at a time | EKS enforces it        |
+
+---
+
+
 
 
 
