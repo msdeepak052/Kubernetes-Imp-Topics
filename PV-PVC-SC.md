@@ -251,8 +251,107 @@ kubectl apply -f efs-app-deployment.yaml
 | **StorageClass** | A dynamic provisioning template                                      |
 | **EFS**          | AWS-managed shared NFS, perfect for shared volume access across pods |
 
+### **Access Modes in PersistentVolumeClaims (PVC) with Examples & Use Cases**  
+In Kubernetes, **Access Modes** define how a PersistentVolume (PV) can be mounted by a Pod. They determine the read-write capabilities and the number of nodes that can access the volume simultaneously.  
+
+There are **three access modes** available for PVCs:  
+
+| Access Mode           | Description | Example Use Cases |
+|----------------------|------------|------------------|
+| **ReadWriteOnce (RWO)** | The volume can be mounted as read-write by a single node. | Single-instance databases (MySQL, PostgreSQL), local caching. |
+| **ReadOnlyMany (ROX)**  | The volume can be mounted as read-only by multiple nodes. | Shared configuration files, static content serving (e.g., Nginx serving HTML files). |
+| **ReadWriteMany (RWX)** | The volume can be mounted as read-write by multiple nodes. | Shared file storage (NFS, CephFS), CI/CD pipelines, distributed logging. |
+
 ---
-Excellent follow-up question, Deepak. The short answer is:
+
+### **1. ReadWriteOnce (RWO)**
+- **Only one Pod (on a single node) can read & write at a time.**  
+- If the Pod is rescheduled, another Pod can mount it, but not simultaneously.  
+
+#### **Example PVC Definition:**
+```yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: rwo-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+  storageClassName: standard
+```
+
+#### **Use Cases:**
+- **Single-instance databases** (MySQL, PostgreSQL, etc.)  
+- **Stateful applications** where only one Pod needs write access.  
+- **Local caching** (Redis, Memcached).  
+
+---
+
+### **2. ReadOnlyMany (ROX)**
+- **Multiple Pods (across different nodes) can read, but not write.**  
+- Useful for distributing read-only data.  
+
+#### **Example PVC Definition:**
+```yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: rox-pvc
+spec:
+  accessModes:
+    - ReadOnlyMany
+  resources:
+    requests:
+      storage: 5Gi
+  storageClassName: nfs
+```
+
+#### **Use Cases:**
+- **Shared configuration files** (ConfigMaps can also be used, but ROX is useful for large files).  
+- **Static web content** (e.g., Nginx serving HTML/CSS/JS files from a shared volume).  
+- **Machine learning models** distributed across multiple inference Pods.  
+
+---
+
+### **3. ReadWriteMany (RWX)**
+- **Multiple Pods (across different nodes) can read & write simultaneously.**  
+- Requires a storage backend that supports concurrent access (e.g., NFS, CephFS, Azure Files).  
+
+#### **Example PVC Definition:**
+```yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: rwx-pvc
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 20Gi
+  storageClassName: azurefile
+```
+
+#### **Use Cases:**
+- **Shared file storage** (NFS, CephFS, GlusterFS).  
+- **CI/CD pipelines** where multiple jobs need to access the same workspace.  
+- **Distributed logging & analytics** (multiple Pods writing logs to a shared directory).  
+- **Content management systems (CMS)** where multiple instances need write access.  
+
+---
+
+### **Key Notes:**
+✅ **Not all storage backends support all access modes.**  
+- AWS EBS → Only `ReadWriteOnce`  
+- Azure Disk → Only `ReadWriteOnce`  
+- NFS, CephFS, Azure Files → Support `ReadWriteMany`  
+
+✅ **StatefulSets** typically use `ReadWriteOnce` for database workloads.  
+✅ **Deployments** needing shared storage should use `ReadWriteMany` (if supported).  
+---
 
 > ❌ **No, you do NOT need to create PersistentVolumes (PVs) manually** if you're using a `StorageClass` that supports **dynamic provisioning**.
 
