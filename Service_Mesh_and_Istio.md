@@ -1,7 +1,3 @@
-Great question! Let’s break it down 💡
-
----
-
 ## ✅ What is a **Service Mesh** in Kubernetes?
 
 A **Service Mesh** is an **infrastructure layer** that manages **service-to-service communication** within a Kubernetes (K8s) cluster — especially in **microservices architectures**.
