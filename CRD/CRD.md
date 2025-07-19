@@ -463,11 +463,71 @@ docker build -t devopsdktraining/crontab-controller:latest .
 docker push devopsdktraining/crontab-controller:latest
 ```
 
-> Replace with your Docker Hub username.
+
+## ✅ 6.  Solution: Create a proper **RBAC setup** for your controller
+
+You need to do **3 things**:
 
 ---
 
-## ✅ 6. Kubernetes Deployment YAML
+### 1. **Create a ServiceAccount**
+
+```yaml
+# serviceaccount.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: crontab-controller-sa
+  namespace: default
+```
+
+---
+
+### 2. **Create Role and RoleBinding to allow access to `crontabs`**
+
+```yaml
+# role.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: crontab-controller-role
+  namespace: default
+rules:
+  - apiGroups: ["stable.deepak.com"]
+    resources: ["crontabs"]
+    verbs: ["get", "list", "watch"]
+```
+
+```yaml
+# rolebinding.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: crontab-controller-rb
+  namespace: default
+subjects:
+  - kind: ServiceAccount
+    name: crontab-controller-sa
+    namespace: default
+roleRef:
+  kind: Role
+  name: crontab-controller-role
+  apiGroup: rbac.authorization.k8s.io
+```
+
+---
+
+---
+
+### ✅ Apply All Resources
+
+```bash
+kubectl apply -f serviceaccount.yaml
+kubectl apply -f role.yaml
+kubectl apply -f rolebinding.yaml
+
+
+## ✅ 7. Kubernetes Deployment YAML
 
 ```yaml
 # controller-deployment.yaml
