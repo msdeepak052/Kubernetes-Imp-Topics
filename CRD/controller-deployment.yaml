@@ -13,6 +13,7 @@ spec:
       labels:
         app: crontab-controller
     spec:
+      serviceAccountName: crontab-controller-sa   # 👈 REQUIRED
       containers:
       - name: controller
         image: devopsdktraining/crontab-controller:latest
