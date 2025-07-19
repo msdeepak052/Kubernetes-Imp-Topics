@@ -526,6 +526,8 @@ kubectl apply -f serviceaccount.yaml
 kubectl apply -f role.yaml
 kubectl apply -f rolebinding.yaml
 
+```
+
 
 ## ✅ 7. Kubernetes Deployment YAML
 
@@ -560,7 +562,7 @@ kubectl apply -f controller-deployment.yaml
 
 ---
 
-## ✅ 7. Test
+## ✅ 8. Test
 
 ```bash
 kubectl get cronjobs
