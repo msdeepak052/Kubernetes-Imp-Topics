@@ -18,7 +18,7 @@ def create_cronjob(cron_name, cron_expr, msg):
                                 client.V1Container(
                                     name="echo",
                                     image="busybox",
-                                    args=["/bin/sh", "-c", f"echo {msg}"]
+                                    /bin/sh -c echo "Hello from Deepak's controller!"
                                 )
                             ]
                         )
