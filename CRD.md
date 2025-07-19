@@ -487,7 +487,7 @@ spec:
     spec:
       containers:
       - name: controller
-        image: deepakdevops/crontab-controller:latest
+        image: devopsdktraining/crontab-controller:latests
         imagePullPolicy: Always
 ```
 
