@@ -1,7 +1,3 @@
-Great! Let's go into **detailed, in-depth explanation** of **SSL/TLS**, their purpose, architecture, configuration, and how hackers intercept insecure connections, step-by-step.
-
----
-
 # 🔐 SSL & TLS – In-Depth Guide
 
 ---
