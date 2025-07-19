@@ -1,0 +1,8 @@
+# crontab-cr.yaml
+apiVersion: stable.deepak.com/v1
+kind: CronTab
+metadata:
+  name: hello-cron
+spec:
+  cronSpec: "*/2 * * * *"
+  message: "Hello from Deepak's controller!"

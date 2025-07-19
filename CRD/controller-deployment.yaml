@@ -1,0 +1,19 @@
+# controller-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: crontab-controller
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: crontab-controller
+  template:
+    metadata:
+      labels:
+        app: crontab-controller
+    spec:
+      containers:
+      - name: controller
+        image: deepakdevops/crontab-controller:latest
+        imagePullPolicy: Always
