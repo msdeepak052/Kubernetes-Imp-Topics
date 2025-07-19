@@ -496,6 +496,10 @@ rules:
   - apiGroups: ["stable.deepak.com"]
     resources: ["crontabs"]
     verbs: ["get", "list", "watch"]
+  - apiGroups: ["batch"]
+    resources: ["cronjobs"]
+    verbs: ["create", "get", "list"]
+
 ```
 
 ```yaml
