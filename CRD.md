@@ -485,6 +485,7 @@ spec:
       labels:
         app: crontab-controller
     spec:
+      serviceAccountName: crontab-controller-sa  # 👈 Add this line
       containers:
       - name: controller
         image: devopsdktraining/crontab-controller:latests
