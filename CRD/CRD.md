@@ -574,7 +574,8 @@ kubectl get pods
 kubectl logs deployment/crontab-controller
 ```
 
-<img width="945" height="234" alt="image" src="https://github.com/user-attachments/assets/63892cbb-ed1d-4c01-8fef-88035d3a8ccc" />
+<img width="959" height="297" alt="image" src="https://github.com/user-attachments/assets/f972a9dd-4c39-4452-8d73-7b1bd1fc4e78" />
+
 
 
 You should see:
