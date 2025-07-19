@@ -68,6 +68,9 @@ You define:
                  +------------------+
 ```
 
+<img width="1617" height="967" alt="image" src="https://github.com/user-attachments/assets/e114e0db-de38-4cf7-b822-ccef1cb9186e" />
+
+
 * You create a new **CRD** (`kind: CustomResourceDefinition`)
 * The API server now understands a new type (e.g., `crontabs.stable.example.com`)
 * You can now `kubectl get crontabs`
