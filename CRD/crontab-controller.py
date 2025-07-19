@@ -3,10 +3,11 @@ import time
 import os
 
 def create_cronjob(cron_name, cron_expr, msg):
-    batch_v1 = client.BatchV1beta1Api()
-    body = client.V1beta1CronJob(
+    batch_v1 = client.BatchV1Api()
+
+    body = client.V1CronJob(
         metadata=client.V1ObjectMeta(name=f"{cron_name}-job"),
-        spec=client.V1beta1CronJobSpec(
+        spec=client.V1CronJobSpec(
             schedule=cron_expr,
             job_template=client.V1JobTemplateSpec(
                 spec=client.V1JobSpec(
@@ -32,6 +33,7 @@ def create_cronjob(cron_name, cron_expr, msg):
         print(f"✅ Created CronJob: {cron_name}-job")
     except Exception as e:
         print(f"⚠️ Failed to create job: {e}")
+
 
 def main():
     config.load_incluster_config() if os.getenv("KUBERNETES_SERVICE_HOST") else config.load_kube_config()
