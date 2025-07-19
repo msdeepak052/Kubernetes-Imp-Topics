@@ -574,6 +574,9 @@ kubectl get pods
 kubectl logs deployment/crontab-controller
 ```
 
+<img width="945" height="234" alt="image" src="https://github.com/user-attachments/assets/63892cbb-ed1d-4c01-8fef-88035d3a8ccc" />
+
+
 You should see:
 
 * Your controller reacting to the CR
