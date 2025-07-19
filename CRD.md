@@ -459,8 +459,8 @@ CMD ["python", "crontab-controller.py"]
 ## ✅ 5. Build & Push Docker Image
 
 ```bash
-docker build -t deepakdevops/crontab-controller:latest .
-docker push deepakdevops/crontab-controller:latest
+docker build -t devopsdktraining/crontab-controller:latest .
+docker push devopsdktraining/crontab-controller:latest
 ```
 
 > Replace with your Docker Hub username.
