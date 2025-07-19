@@ -267,3 +267,197 @@ Password: secret123
 
 ---
 
+To securely connect **`kubectl`** to the **Kubernetes API server**, **SSL/TLS** is used to:
+
+* Encrypt communication between the client (`kubectl`) and the API server.
+* Authenticate the identity of both client and server using certificates.
+* Authorize access using certificates or tokens.
+
+Let’s break it down in detail:
+
+---
+
+# 🔐 TLS/SSL Between `kubectl` and Kubernetes API Server
+
+---
+
+## 🧱 1. Components Involved
+
+| Component                          | Role                                                                            |
+| ---------------------------------- | ------------------------------------------------------------------------------- |
+| `kubectl`                          | CLI tool (acts as the **client**)                                               |
+| API Server                         | Kubernetes control plane endpoint                                               |
+| kubeconfig file (`~/.kube/config`) | Holds cluster access information, including certificates and API server address |
+| Certificates                       | Used for mutual TLS authentication (mTLS)                                       |
+
+---
+
+## 🔁 2. How SSL/TLS Works Between `kubectl` and API Server
+
+### Step-by-Step TLS Flow:
+
+1. **`kubectl` reads `kubeconfig`** file.
+2. It retrieves:
+
+   * API server endpoint (`https://<ip>:6443`)
+   * CA certificate to trust the API server
+   * Client certificate/key or token to authenticate
+3. **Mutual TLS (mTLS) occurs**:
+
+   * API server presents its **server certificate**.
+   * `kubectl` verifies it using the **CA certificate**.
+   * Optionally, API server requests client cert (mTLS).
+4. If verified, a **secure connection is established**.
+5. `kubectl` sends REST API calls over HTTPS.
+
+---
+
+## 🧾 3. Sample `kubeconfig` File with TLS
+
+```yaml
+apiVersion: v1
+clusters:
+- cluster:
+    certificate-authority: /etc/kubernetes/pki/ca.crt     # Trusted CA
+    server: https://192.168.1.100:6443                     # API server URL
+  name: kubernetes
+contexts:
+- context:
+    cluster: kubernetes
+    user: kubernetes-admin
+  name: kubernetes-context
+current-context: kubernetes-context
+kind: Config
+preferences: {}
+users:
+- name: kubernetes-admin
+  user:
+    client-certificate: /etc/kubernetes/pki/admin.crt      # Client certificate
+    client-key: /etc/kubernetes/pki/admin.key              # Client private key
+```
+
+### Key TLS files involved:
+
+| File        | Purpose                                 |
+| ----------- | --------------------------------------- |
+| `ca.crt`    | CA that signed API server’s certificate |
+| `admin.crt` | Client certificate (`kubectl`)          |
+| `admin.key` | Client’s private key                    |
+
+---
+
+## 🛠️ 4. TLS Certificate Configuration in Control Plane
+
+Certificates are usually located in:
+
+```
+/etc/kubernetes/pki/
+```
+
+| File                      | Description                        |
+| ------------------------- | ---------------------------------- |
+| `ca.crt`                  | Root certificate authority         |
+| `ca.key`                  | CA's private key (kept secret!)    |
+| `apiserver.crt`           | TLS certificate used by API server |
+| `apiserver.key`           | Private key for API server TLS     |
+| `admin.crt` / `admin.key` | Used by kubectl (via kubeconfig)   |
+
+---
+
+## 🔐 5. Example: Creating TLS Certs for `kubectl` (manual process)
+
+### Step 1: Generate a key and CSR
+
+```bash
+openssl genrsa -out admin.key 2048
+
+openssl req -new -key admin.key -out admin.csr \
+  -subj "/CN=admin/O=system:masters"
+```
+
+* `CN=admin`: Common Name (identity of the user)
+* `O=system:masters`: Group that grants cluster-admin rights
+
+### Step 2: Sign CSR with Kubernetes CA
+
+```bash
+openssl x509 -req -in admin.csr -CA ca.crt -CAkey ca.key -CAcreateserial \
+  -out admin.crt -days 365
+```
+
+This `admin.crt` + `admin.key` can be used in kubeconfig for secure access.
+
+---
+
+## 🛑 6. How Hackers Can Intercept If TLS is Misconfigured
+
+### 🔴 Scenario 1: No TLS
+
+* If Kubernetes API is served over plain HTTP, attackers can:
+
+  * **Sniff credentials**
+  * **Inject API calls**
+  * **Impersonate kubectl**
+
+### 🔴 Scenario 2: Invalid/Untrusted Certs
+
+* If client **ignores certificate errors**, attacker can MITM:
+
+  * Present **fake API server cert**
+  * Trick `kubectl` into connecting to a rogue server
+
+### 🔴 Scenario 3: Stolen `kubeconfig` File
+
+* If an attacker gets access to kubeconfig with client keys:
+
+  * They get **full access** to the cluster (if not scoped)
+  * Certificates often have **long lifespans**
+
+---
+
+## 🧰 7. How to Protect the Connection
+
+| Security Measure                 | Description                                              |
+| -------------------------------- | -------------------------------------------------------- |
+| Use TLS 1.2 or 1.3               | Configure API server to reject old/insecure TLS versions |
+| Strong Certificates              | Use short-lived certs with secure key size (2048+ bit)   |
+| Role-Based Access Control (RBAC) | Limit what a user/certificate can do                     |
+| Encrypt Secrets at Rest          | API server encrypts secrets in etcd using KMS            |
+| Rotate Certificates              | Use automation to renew and rotate certs regularly       |
+| Audit Logs                       | Monitor all kubectl/API activity                         |
+| Don’t expose API server publicly | Use private networking or a bastion host                 |
+
+---
+
+## 🔍 8. Test TLS Connection from `kubectl`
+
+### View API Server Certificate:
+
+```bash
+openssl s_client -connect <apiserver-ip>:6443 -showcerts
+```
+
+### View TLS Debug Info from `kubectl`:
+
+```bash
+KUBECONFIG=~/.kube/config kubectl get pods --v=8
+```
+
+* Shows HTTP request and TLS handshake info
+
+---
+
+## ✅ Summary
+
+| Topic            | Detail                                                                     |
+| ---------------- | -------------------------------------------------------------------------- |
+| Goal             | Secure communication between `kubectl` and API server using TLS            |
+| Mechanism        | Mutual TLS (client & server present certificates)                          |
+| Configuration    | Done via `kubeconfig` using certs, keys, and CA                            |
+| Certificate Path | Usually under `/etc/kubernetes/pki`                                        |
+| Risk Without TLS | MITM, data theft, impersonation                                            |
+| Best Practices   | Short-lived certs, RBAC, audit logs, encryption, secure kubeconfig storage |
+
+---
+
+
