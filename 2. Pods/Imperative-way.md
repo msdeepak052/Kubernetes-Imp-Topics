@@ -1,4 +1,4 @@
-# Imperative Way of Launching Pods
+# Imperative Way of Launching Resources
 
 The **imperative way** allows you to create and manage Kubernetes pods directly using `kubectl` commands, without writing YAML manifests.
 
