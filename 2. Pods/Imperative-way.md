@@ -28,6 +28,8 @@ kubectl run nginx-pod --image=nginx --restart=Never
 * `--restart=Never` ensures this is a **Pod**, not a Deployment.
 * This will create a pod named `nginx-pod` running the `nginx` image.
 
+<img width="745" height="458" alt="image" src="https://github.com/user-attachments/assets/80021e5e-ce27-4ed1-80ec-b4042a2f7b3d" />
+
 ---
 
 ### **Deployment**
@@ -52,6 +54,11 @@ kubectl expose deployment my-deploy --port=80 --target-port=80 --type=NodePort
 ```
 
 * Exposes your deployment with a service on port 80, accessible via NodePort.
+```bash
+kubectl port-forward svc/my-deploy 8080:80
+```
+
+<img width="1920" height="817" alt="image" src="https://github.com/user-attachments/assets/12efe78d-e035-4e1c-8913-c12606173898" />
 
 ---
 
