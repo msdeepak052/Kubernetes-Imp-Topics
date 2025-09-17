@@ -192,9 +192,10 @@ spec:
 
 ✅ With this:
 
-Option 1: Access via NodePort → http://<NodeIP>:30080
+**Option 1:** Access via NodePort → http://<NodeIP>:30080
+**Option 2:** Port forward → kubectl port-forward svc/java-deepak-webapp-svc 8080:80 -n test-ns
 
-Option 2: Port forward → kubectl port-forward svc/java-deepak-webapp-svc 8080:80 -n test-ns
+
 ---
 
 # 🔹 Why We Need Them
