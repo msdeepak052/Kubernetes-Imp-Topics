@@ -173,6 +173,21 @@ spec:
 | Usage today       | Rare (legacy apps)         | Created by Deployment   | Standard for apps             |
 
 ---
+### Service to run the application
+apiVersion: v1
+kind: Service
+metadata:
+  name: myapp-nodeport
+spec:
+  type: NodePort
+  selector:
+    app: myapp   # Must match Deployment/Pod labels
+  ports:
+  - port: 80           # Service Port (cluster-internal)
+    targetPort: 80     # Container Port
+    nodePort: 30080    # NodePort (range 30000-32767)
+
+---
 
 # 🔹 Why We Need Them
 
