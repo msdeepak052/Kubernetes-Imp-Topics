@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: java-deepak-webapp-rs
+  namespace: test-ns
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: java-deepak-webapp
+  template:
+    metadata:
+      labels:
+        app: java-deepak-webapp
+    spec:
+      containers:
+      - name: java-deepak-webapp-container
+        image: devopsdktraining/java-deepak-webapp:1
+        ports:
+        - name: web
+          containerPort: 8080
+          protocol: TCP
