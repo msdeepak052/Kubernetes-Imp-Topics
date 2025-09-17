@@ -174,6 +174,8 @@ spec:
 
 ---
 ### Service to run the application
+
+```yaml
 apiVersion: v1
 kind: Service
 metadata:
@@ -186,7 +188,13 @@ spec:
   - port: 80           # Service Port (cluster-internal)
     targetPort: 80     # Container Port
     nodePort: 30080    # NodePort (range 30000-32767)
+```
 
+✅ With this:
+
+Option 1: Access via NodePort → http://<NodeIP>:30080
+
+Option 2: Port forward → kubectl port-forward svc/java-deepak-webapp-svc 8080:80 -n test-ns
 ---
 
 # 🔹 Why We Need Them
