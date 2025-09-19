@@ -6,7 +6,8 @@ metadata:
 spec:
   replicas: 2
   selector:
-    app: java-deepak-webapp
+    matchLabels:
+      app: java-deepak-webapp
   template:
     metadata:
       labels:
