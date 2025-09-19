@@ -237,7 +237,7 @@ sessionAffinity: None
 
 ---
 
- **How Kubernetes Services distribute traffic across Pods** 
+ #### **How Kubernetes Services distribute traffic across Pods** 
 
 ---
 
@@ -330,6 +330,7 @@ If you enable `sessionAffinity: ClientIP`, load balancing is **overridden**:
 | With SessionAffinity | Same Pod per client           | ✅ Yes (via `sessionAffinity`)  |
 
 ---
+
 
 
 
