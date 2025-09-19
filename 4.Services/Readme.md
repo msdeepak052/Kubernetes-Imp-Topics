@@ -13,6 +13,9 @@
 
 There are mainly **4 types**:
 
+<img width="3000" height="3900" alt="image" src="https://github.com/user-attachments/assets/a62afa06-309b-48f1-a631-db27f0fb2035" />
+
+
 ### (A) **ClusterIP** (default)
 
 * Exposes the Service **inside the cluster only**.
@@ -330,6 +333,7 @@ If you enable `sessionAffinity: ClientIP`, load balancing is **overridden**:
 | With SessionAffinity | Same Pod per client           | ✅ Yes (via `sessionAffinity`)  |
 
 ---
+
 
 
 
