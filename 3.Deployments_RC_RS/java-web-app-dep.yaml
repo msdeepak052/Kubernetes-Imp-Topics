@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ReplicationController
 metadata:
-  name: java-deepak-webapp-rc
+  name: java-deepak-webapp-deployment
   namespace: test-ns
 spec:
   replicas: 2
