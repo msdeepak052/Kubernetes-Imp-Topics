@@ -304,12 +304,16 @@ kubectl set image deployment/my-app nginx=nginx:1.21
 # Check rollout status
 kubectl rollout status deployment/my-app
 
+# Rollout History
+kubectl rollout history deployment/my-app
+
 # Rollback if needed
 kubectl rollout undo deployment/my-app
 ```
 
 ---
 
+<img width="1846" height="937" alt="image" src="https://github.com/user-attachments/assets/1921fcda-7422-4aca-a87d-5f70cc794d6c" />
 
 
 ---
