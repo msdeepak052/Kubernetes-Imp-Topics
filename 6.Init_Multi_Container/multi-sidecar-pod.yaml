@@ -2,6 +2,8 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: multi-container-demo
+  labels:
+    app: multi-container-demo   # 👈 Added label for Service selector
 spec:
   containers:
   - name: web
@@ -22,3 +24,17 @@ spec:
   volumes:
   - name: shared-data
     emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: multi-container-svc
+spec:
+  selector:
+    # Service selects the Pod by its label
+    app: multi-container-demo
+  ports:
+    - name: http
+      port: 80           # Service port (ClusterIP inside cluster)
+      targetPort: 80     # ContainerPort of nginx
+  type: ClusterIP        # Default, accessible only inside cluster
