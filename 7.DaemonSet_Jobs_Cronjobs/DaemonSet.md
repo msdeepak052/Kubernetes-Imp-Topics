@@ -1,5 +1,4 @@
 # **DaemonSets**
----
 
 ## 🔹 What is a DaemonSet?
 
@@ -175,3 +174,4 @@ kubectl get pods -o wide --selector=app=nginx-daemon
 ---
 
 Deepak, do you want me to also show you **how to expose a DaemonSet via Service** (e.g., making the nginx DaemonSet accessible on each node like a node-level web server)?
+
