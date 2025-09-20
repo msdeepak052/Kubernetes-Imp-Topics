@@ -178,6 +178,23 @@ spec:
   - name: busybox
     image: busybox
     command: ['sh', '-c', 'sleep 3600']
+    envFrom:
+    - configMapRef:
+        name: app-config
+    - secretRef:
+        name: db-secret
+    volumeMounts:
+    - name: config-volume
+      mountPath: /etc/config
+    - name: secret-volume
+      mountPath: /etc/secret
+  volumes:
+  - name: config-volume
+    configMap:
+      name: app-config
+  - name: secret-volume
+    secret:
+      secretName: db-secret
 ```
 
 ---
@@ -241,34 +258,7 @@ cat /etc/secret/username
 
 2. **OR inject the same ConfigMap/Secret into busybox** for debugging:
 
-```yaml
-apiVersion: v1
-kind: Pod
-metadata:
-  name: busybox-test
-spec:
-  containers:
-  - name: busybox
-    image: busybox
-    command: ['sh', '-c', 'sleep 3600']
-    envFrom:
-    - configMapRef:
-        name: app-config
-    - secretRef:
-        name: db-secret
-    volumeMounts:
-    - name: config-volume
-      mountPath: /etc/config
-    - name: secret-volume
-      mountPath: /etc/secret
-  volumes:
-  - name: config-volume
-    configMap:
-      name: app-config
-  - name: secret-volume
-    secret:
-      secretName: db-secret
-```
+
 
 Now if you `kubectl exec -it busybox-test -- sh`, you’ll see the same env vars and files.
 
@@ -299,4 +289,5 @@ Now if you `kubectl exec -it busybox-test -- sh`, you’ll see the same env vars
 * **Deployment** consumes them as **env vars** or **mounted files**.
 
 ---
+
 
