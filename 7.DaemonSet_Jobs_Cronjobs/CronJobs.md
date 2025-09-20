@@ -44,6 +44,161 @@ Real-world use cases:
 * `startingDeadlineSeconds` → if job missed schedule, how long to start late.
 
 ---
+> Let’s **monitor your CronJob (`date-printer`) step by step**. I’ll show you how to confirm it’s working, how to check its Jobs/Pods, and how to debug if needed.
+
+---
+
+# 🔍 Steps to Check & Monitor CronJob
+
+## ✅ 1. Verify CronJob is Created
+
+```bash
+kubectl get cronjob
+```
+
+Expected output:
+
+```
+NAME           SCHEDULE      SUSPEND   ACTIVE   LAST SCHEDULE   AGE
+date-printer   */1 * * * *   False     0        <timestamp>     1m
+```
+
+👉 Look at:
+
+* **SCHEDULE** → `"*/1 * * * *"` (every 1 min ✅)
+* **LAST SCHEDULE** → shows when it last triggered a job.
+
+---
+
+## ✅ 2. Check Details of the CronJob
+
+```bash
+kubectl describe cronjob date-printer
+```
+
+Things to look at:
+
+* `Schedule`
+* `Concurrency Policy`
+* `Last Schedule Time`
+* Any events (e.g., scheduling failures).
+
+---
+
+## ✅ 3. List Jobs Created by the CronJob
+
+Every run creates a **Job**:
+
+```bash
+kubectl get jobs --watch
+```
+
+You’ll see jobs like:
+
+```
+NAME                     COMPLETIONS   DURATION   AGE
+date-printer-28272643    1/1           5s         1m
+date-printer-28272644    1/1           4s         2m
+```
+
+👉 `1/1` completions = job finished successfully.
+
+---
+
+## ✅ 4. Check Pods Spawned by Jobs
+
+Each Job creates one or more Pods:
+
+```bash
+kubectl get pods --selector=job-name=<job-name>
+```
+
+Example:
+
+```
+NAME                           READY   STATUS      RESTARTS   AGE
+date-printer-28272643-xyz12    0/1     Completed   0          1m
+```
+
+---
+
+## ✅ 5. Check Pod Logs (Output of CronJob)
+
+```bash
+kubectl logs <pod-name>
+```
+
+Example output:
+
+```
+Mon Sep 19 15:41:12 UTC 2025
+Hello from Kubernetes CronJob!
+```
+
+👉 This confirms your CronJob executed successfully.
+
+---
+
+## ✅ 6. Monitor in Real Time
+
+* Watch Jobs:
+
+  ```bash
+  kubectl get jobs --watch
+  ```
+* Watch Pods:
+
+  ```bash
+  kubectl get pods --watch
+  ```
+* Stream logs (if multiple jobs are running):
+
+  ```bash
+  kubectl logs -f job/<job-name>
+  ```
+
+---
+
+## ✅ 7. Trigger Manually (Optional for Testing)
+
+Instead of waiting for 1 min, you can manually trigger:
+
+```bash
+kubectl create job --from=cronjob/date-printer manual-test
+kubectl logs -f job/manual-test
+```
+
+---
+
+## ✅ 8. Clean Up Old Jobs/Pods
+
+By default, CronJobs keep history. You can remove old runs:
+
+```bash
+kubectl delete job --selector=job-name=date-printer
+kubectl delete pod --selector=job-name=date-printer
+```
+
+Or set limits in YAML:
+
+```yaml
+successfulJobsHistoryLimit: 3
+failedJobsHistoryLimit: 1
+```
+
+---
+
+# ⚡ Quick Checklist for Monitoring
+
+1. `kubectl get cronjob` → check schedule + last schedule time
+2. `kubectl get jobs` → see Jobs created
+3. `kubectl get pods` → see Pods spawned
+4. `kubectl logs <pod>` → check output
+5. `kubectl describe cronjob` → check events if it’s not running
+
+---
+
+
 
 ## 🔹 Example 1: Simple CronJob (prints date every minute)
 
@@ -69,6 +224,14 @@ spec:
 ```
 
 👉 Run this, and every minute a Pod will run, print date, then exit.
+
+<img width="1163" height="847" alt="image" src="https://github.com/user-attachments/assets/26dfc870-fde9-4801-b7ed-786443bf9bd5" />
+
+<img width="700" height="179" alt="image" src="https://github.com/user-attachments/assets/50285401-48b2-4a40-8515-e6ac56144d56" />
+
+<img width="1265" height="224" alt="image" src="https://github.com/user-attachments/assets/3666b75b-a7c6-4e1d-acbd-d9d4bf0cb6c7" />
+
+<img width="1162" height="208" alt="image" src="https://github.com/user-attachments/assets/8d64ec7a-1d90-4d2e-aef0-dc282c85a7b7" />
 
 ---
 
