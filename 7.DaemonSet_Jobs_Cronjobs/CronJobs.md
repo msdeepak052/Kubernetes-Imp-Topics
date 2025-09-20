@@ -233,6 +233,9 @@ spec:
 
 <img width="1162" height="208" alt="image" src="https://github.com/user-attachments/assets/8d64ec7a-1d90-4d2e-aef0-dc282c85a7b7" />
 
+<img width="1163" height="209" alt="image" src="https://github.com/user-attachments/assets/88705551-e1dd-4dbe-a554-64fa214343a7" />
+
+
 ---
 
 ## 🔹 Example 2: Real-Life CronJob (Database Backup to S3)
