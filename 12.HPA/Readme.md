@@ -232,7 +232,7 @@ kubectl describe hpa nginx-hpa
 ```bash
 kubectl run -i --tty load-generator --image=busybox --restart=Never -- /bin/sh
 # Inside Pod:
-while true; do wget -q -O- http://nginx-deployment; done
+while true; do wget -q -O- http://nginx-service; done
 ```
 
 2. Monitor HPA scaling:
@@ -254,4 +254,5 @@ kubectl get pods -o wide
 * **autoscaling/v2** API supports multiple metrics and external metrics.
 
 ---
+
 
