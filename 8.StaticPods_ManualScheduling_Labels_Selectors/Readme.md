@@ -131,3 +131,148 @@ kubectl get pods -n kube-system -w | grep apiserver
 | **Visibility** | Visible as read-only **Mirror Pods** in the API | Fully manageable API objects |
 
 In short, **Static Pods are the foundation upon which a self-hosted Kubernetes control plane is built.** They provide a simple, reliable mechanism to get the cluster's management services running before the cluster itself fully exists.
+
+---
+
+# 🔄 Manual Rescheduling in Kubernetes
+
+## 🔹 What does it mean?
+
+* In Kubernetes, **Pods are not automatically rescheduled** if a node becomes unschedulable (e.g., deleted, cordoned, or fails) **unless** the Pod is controlled by a higher-level controller like a **Deployment, ReplicaSet, StatefulSet, or DaemonSet**.
+* **Manual rescheduling** refers to **manually intervening** to move workloads (Pods) to a healthy node.
+
+---
+
+## 🔹 Why is Manual Rescheduling Needed?
+
+1. **Static Pods or standalone Pods**
+
+   * If you created Pods **without a controller**, they will not reschedule automatically when a node fails.
+2. **Maintenance of a node**
+
+   * When draining/cordoning a node, workloads must move elsewhere.
+3. **Performance or troubleshooting**
+
+   * If you need to move Pods to a different node for debugging or performance balancing.
+4. **Testing scenarios**
+
+   * To see how apps behave when Pods are deleted or recreated.
+
+---
+
+## 🔹 Ways to Do Manual Rescheduling
+
+### 1️⃣ Delete the Pod (controller recreates it on a new node)
+
+If the Pod is managed by a **Deployment/ReplicaSet/StatefulSet**:
+
+```bash
+kubectl delete pod <pod-name>
+```
+
+* The controller will immediately create a new Pod on a healthy node.
+
+📌 Example with Deployment:
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deploy
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:latest
+```
+
+👉 If you delete one Pod, a new one is scheduled automatically on another node.
+
+---
+
+### 2️⃣ Evict Pods from a Node (Cordon & Drain)
+
+When you want to move workloads away from a specific node:
+
+```bash
+kubectl cordon <node-name>   # Mark node unschedulable
+kubectl drain <node-name> --ignore-daemonsets --delete-emptydir-data
+```
+
+* All Pods (except DaemonSet and static Pods) will be evicted and rescheduled elsewhere.
+* Useful for **node maintenance**.
+
+---
+
+### 3️⃣ Manually Edit Pod Spec (Not Recommended in Prod)
+
+For standalone Pods (no controller), you can:
+
+```bash
+kubectl delete pod <pod-name>
+kubectl apply -f pod.yaml
+```
+
+If you add `nodeSelector` or `affinity` in YAML, you can force it onto a different node.
+
+📌 Example:
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-pod
+spec:
+  nodeSelector:
+    kubernetes.io/hostname: worker-node-2   # force scheduling on worker-node-2
+  containers:
+  - name: nginx
+    image: nginx
+```
+
+---
+
+### 4️⃣ Pod Disruption Budgets (PDBs) + Evictions
+
+You can set **PodDisruptionBudget** to control voluntary disruptions (like manual rescheduling during drain).
+
+📌 Example PDB:
+
+```yaml
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: nginx-pdb
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: nginx
+```
+
+* Ensures at least **1 Pod always stays running** during rescheduling.
+
+---
+
+## 🔹 Summary
+
+* **Manual Rescheduling** = moving Pods when they don’t move automatically.
+* Needed for: **standalone Pods, node failures, maintenance, balancing**.
+* Types:
+
+  1. Delete Pod (controller reschedules it)
+  2. Cordon + Drain node (evicts Pods)
+  3. Reapply Pod with `nodeSelector` / `affinity`
+  4. Use PDBs to control safe evictions
+
+---
+
+
