@@ -32,6 +32,9 @@ You **don't** want to put this logic in your application container because it vi
 * Run security checks or pre-scripts before app starts.
 
 ---
+<img width="1241" height="1416" alt="image" src="https://github.com/user-attachments/assets/c14cb6ac-3bb1-4ff7-a44e-dd40142ba962" />
+
+---
 
 ## 📝 Example YAML (Init Container)
 
@@ -142,6 +145,9 @@ Containers that run alongside your main "app" container for its entire lifecycle
 * File updater + main application sharing a volume.
 
 ---
+
+<img width="640" height="293" alt="image" src="https://github.com/user-attachments/assets/9e718b0d-57de-47d4-a5a5-d50b8b2f6c6a" />
+
 
 ## 📝 Example YAML (Multi-Container Pod)
 
@@ -275,4 +281,5 @@ This demonstrates how the sidecar has access to the files created by the main co
 * Both patterns make Pods **more powerful & flexible**.
 
 ---
+
 
