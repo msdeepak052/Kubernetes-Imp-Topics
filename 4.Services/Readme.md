@@ -334,6 +334,267 @@ If you enable `sessionAffinity: ClientIP`, load balancing is **overridden**:
 
 ---
 
+ ## **Handy list of important Service-related commands** 
+
+---
+
+## 🔹 Basic Service Commands
+
+### 1. List Services
+
+```bash
+kubectl get svc
+kubectl get svc -n test-ns
+```
+
+👉 Lists all Services in the default or specific namespace.
+
+---
+
+### 2. Detailed Service Information
+
+```bash
+kubectl describe svc my-service
+```
+
+👉 Shows selector, ports, sessionAffinity, endpoints (important for debugging).
+
+---
+
+### 3. Show Endpoints of a Service
+
+```bash
+kubectl get endpoints my-service
+kubectl describe endpoints my-service
+```
+
+👉 Confirms which Pods are backing the Service. If `ENDPOINTS` is empty → Service selector mismatch.
+
+---
+
+### 4. Get Service in YAML Format
+
+```bash
+kubectl get svc my-service -o yaml
+```
+
+👉 Useful for checking `sessionAffinity`, `ClusterIP`, annotations, etc.
+
+---
+
+### 5. Expose a Deployment as a Service
+
+```bash
+kubectl expose deployment my-app --name=my-service --port=80 --target-port=8080 --type=ClusterIP
+```
+
+👉 Quick way to create a Service without writing YAML.
+
+---
+
+## 🔹 Service Testing Commands
+
+### 6. Access Service Inside the Cluster
+
+```bash
+kubectl run test-pod --rm -it --image=busybox:1.28 -- sh
+# Inside pod shell:
+wget -O- http://my-service:80
+```
+
+👉 Validates DNS & connectivity to Service.
+
+---
+
+### 7. Access Service Outside the Cluster
+
+* **NodePort**
+
+```bash
+curl http://<NodeIP>:<NodePort>
+```
+
+* **LoadBalancer**
+
+```bash
+kubectl get svc my-service
+# Copy EXTERNAL-IP
+curl http://<External-IP>:80
+```
+
+---
+
+### 8. Port Forwarding (Useful for Local Debugging)
+
+```bash
+kubectl port-forward svc/my-service 8080:80
+```
+
+👉 Maps Service port 80 to localhost:8080.
+
+---
+
+## 🔹 Advanced / Troubleshooting Commands
+
+### 9. Check Cluster DNS for Service
+
+```bash
+kubectl exec -it <pod-name> -- nslookup my-service
+kubectl exec -it <pod-name> -- nslookup my-service.test-ns.svc.cluster.local
+```
+
+👉 Verifies Service DNS resolution.
+
+---
+
+### 10. Delete a Service
+
+```bash
+kubectl delete svc my-service
+```
+
+---
+
+### 11. Debug Service Traffic Flow
+
+```bash
+kubectl get endpoints my-service
+kubectl logs <pod-name>
+```
+
+👉 Ensures traffic is hitting correct Pods.
+
+---
+
+### 12. Show All Services in All Namespaces
+
+```bash
+kubectl get svc -A
+```
+
+---
+
+### 13. Debug NodePort Range (30000–32767)
+
+```bash
+kubectl get svc my-service -o wide
+```
+
+👉 Shows which NodePort is allocated.
+
+---
+
+### 14. Verify Session Affinity
+
+```bash
+kubectl describe svc my-service | grep -i sessionAffinity
+```
+
+---
+
+✅ **Quick Reference for Interview/Hands-on**
+
+* `kubectl get svc` → list services
+* `kubectl describe svc <name>` → details & endpoints
+* `kubectl get endpoints <svc>` → backend Pods
+* `kubectl expose` → create Service quickly
+* `kubectl port-forward` → test locally
+* `kubectl exec` + `nslookup` → DNS debugging
+
+---
+
+> Here’s a **one-page Kubernetes Services Cheat Sheet** with the most important commands, grouped logically for **creation, testing, and debugging**.
+
+---
+
+# 🚀 Kubernetes Services – One Page Cheat Sheet
+
+## 🔹 Create & Manage Services
+
+```bash
+# List Services in current namespace
+kubectl get svc
+
+# List Services in all namespaces
+kubectl get svc -A
+
+# Create Service from Deployment
+kubectl expose deployment my-app \
+  --name=my-service --port=80 --target-port=8080 --type=ClusterIP
+
+# Get Service details in YAML
+kubectl get svc my-service -o yaml
+
+# Delete a Service
+kubectl delete svc my-service
+```
+
+---
+
+## 🔹 Inspect Services
+
+```bash
+# Describe a Service (selectors, ports, sessionAffinity)
+kubectl describe svc my-service
+
+# Show Endpoints (Pods backing the Service)
+kubectl get endpoints my-service
+kubectl describe endpoints my-service
+
+# Show Service with NodePort/ClusterIP info
+kubectl get svc my-service -o wide
+```
+
+---
+
+## 🔹 Test Connectivity
+
+```bash
+# Run a temporary Pod to test Service from inside cluster
+kubectl run test-pod --rm -it --image=busybox:1.28 -- sh
+wget -O- http://my-service:80
+
+# Test DNS resolution
+kubectl exec -it <pod> -- nslookup my-service
+kubectl exec -it <pod> -- nslookup my-service.test-ns.svc.cluster.local
+
+# Port-forward Service to local machine
+kubectl port-forward svc/my-service 8080:80
+
+# Access NodePort Service from outside
+curl http://<NodeIP>:<NodePort>
+
+# Access LoadBalancer Service from outside
+kubectl get svc my-service
+curl http://<External-IP>:80
+```
+
+---
+
+## 🔹 Session Affinity
+
+```bash
+# Check sessionAffinity setting
+kubectl describe svc my-service | grep -i sessionAffinity
+```
+
+---
+
+✅ **Pro Tips**
+
+* **ClusterIP** → internal only
+* **NodePort** → `<NodeIP>:<NodePort>`
+* **LoadBalancer** → Cloud external IP
+* **ExternalName** → DNS alias
+* **Endpoints empty?** → Service selector mismatch
+
+---
+
+
+
+
+
+
 
 
 
