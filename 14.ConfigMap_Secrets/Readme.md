@@ -214,6 +214,69 @@ cat /etc/secret/username
 cat /etc/secret/password
 ```
 
+* The **ConfigMap** and **Secret** are attached only to the **nginx deployment**.
+* The **busybox pod** I gave is just a standalone pod, it has no link to the ConfigMap or Secret.
+  👉 That’s why you won’t see `$APP_ENV`, `$DB_USER`, etc. inside busybox unless you also mount or inject them there.
+
+---
+
+### 🔹 Why I added Busybox?
+
+Busybox is usually used as a **debug pod** in Kubernetes to check cluster networking, services, and mounted configs.
+But since in our YAML it doesn’t reference the ConfigMap/Secret, it won’t see those values.
+
+---
+
+### 🔹 Correct Ways to See ConfigMap/Secret Values
+
+1. **Check inside the nginx pod (where they are mounted):**
+
+```bash
+kubectl exec -it <nginx-pod-name> -- sh
+echo $APP_ENV
+echo $DB_USER
+cat /etc/config/config.json
+cat /etc/secret/username
+```
+
+2. **OR inject the same ConfigMap/Secret into busybox** for debugging:
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: busybox-test
+spec:
+  containers:
+  - name: busybox
+    image: busybox
+    command: ['sh', '-c', 'sleep 3600']
+    envFrom:
+    - configMapRef:
+        name: app-config
+    - secretRef:
+        name: db-secret
+    volumeMounts:
+    - name: config-volume
+      mountPath: /etc/config
+    - name: secret-volume
+      mountPath: /etc/secret
+  volumes:
+  - name: config-volume
+    configMap:
+      name: app-config
+  - name: secret-volume
+    secret:
+      secretName: db-secret
+```
+
+Now if you `kubectl exec -it busybox-test -- sh`, you’ll see the same env vars and files.
+
+---
+
+✅ So the **nginx deployment** is the actual consumer of your ConfigMap and Secret.
+✅ The **busybox pod** can also consume them if you explicitly mount/inject — mainly useful for testing.
+
 ---
 
 ✅ This way you can **see live how ConfigMaps and Secrets are injected** into a Pod both as env vars and files.
@@ -236,3 +299,4 @@ cat /etc/secret/password
 * **Deployment** consumes them as **env vars** or **mounted files**.
 
 ---
+
