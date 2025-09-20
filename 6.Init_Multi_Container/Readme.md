@@ -203,6 +203,14 @@ You should see:
 ```
 Hello from sidecar!
 ```
+---
+<img width="1076" height="195" alt="image" src="https://github.com/user-attachments/assets/aec208aa-d48f-4741-a4fb-e4b0c03bc82a" />
+
+
+
+---
+
+
 ### Example YAML: Pod with a Log Shipper Sidecar
 
 This pod runs a simple web server and a sidecar container that tails the server's access log and prints it to stdout.
@@ -287,6 +295,7 @@ This demonstrates how the sidecar has access to the files created by the main co
 * Both patterns make Pods **more powerful & flexible**.
 
 ---
+
 
 
 
