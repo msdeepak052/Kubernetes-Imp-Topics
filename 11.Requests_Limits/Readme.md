@@ -288,4 +288,91 @@ kubectl describe resourcequota compute-quota -n dev
 * Requests/limits in Pods are **validated against the quota**.
 
 ---
+# 🔹 **1. Requests vs Limits Recap**
+
+| Term        | Meaning                                     | How It Works                                                                 |
+| ----------- | ------------------------------------------- | ---------------------------------------------------------------------------- |
+| **Request** | Minimum guaranteed resources a Pod asks for | Scheduler uses this to place the Pod on a node with enough free resources.   |
+| **Limit**   | Maximum resources a Pod can use at runtime  | Enforced at runtime: CPU is throttled, memory above limit triggers OOM kill. |
+
+---
+
+# 🔹 **2. In ResourceQuota**
+
+When you define a ResourceQuota like this:
+
+```yaml
+spec:
+  hard:
+    requests.cpu: "2"
+    requests.memory: "4Gi"
+    limits.cpu: "4"
+    limits.memory: "8Gi"
+```
+
+Interpretation:
+
+1. **requests.cpu/memory** → Aggregate of all Pod **requests** in the namespace cannot exceed this.
+
+   * Scheduler will **deny creating new Pods** if total requested CPU/memory would go beyond this quota.
+2. **limits.cpu/memory** → Aggregate of all Pod **limits** in the namespace cannot exceed this.
+
+   * Ensures that even if a Pod tries to consume its max limit, the total **namespace capacity is capped**.
+
+---
+
+# 🔹 **3. Why Both Are Needed**
+
+* Imagine namespace has quota:
+
+| Resource | Requests | Limits |
+| -------- | -------- | ------ |
+| CPU      | 2 CPU    | 4 CPU  |
+
+* You could deploy **4 Pods**, each requesting `0.5 CPU` (total request = 2 CPU) but each with limit `2 CPU`.
+
+**Scenario**:
+
+| Pod  | Request | Limit |
+| ---- | ------- | ----- |
+| Pod1 | 0.5     | 2     |
+| Pod2 | 0.5     | 2     |
+| Pod3 | 0.5     | 2     |
+| Pod4 | 0.5     | 2     |
+
+* Scheduler allows all 4 Pods ✅ because total requests = 2 CPU ≤ quota requests.
+* Runtime: Pods may try to spike CPU usage up to their **limits** (2 CPU each), but **total limits = 8 CPU**, which exceeds the `limits.cpu` quota of 4 CPU.
+* **Kubernetes will prevent creating these Pods** if limits quota is exceeded.
+
+---
+
+# 🔹 **4. Key Insight**
+
+* **Requests quota** → Controls **what scheduler guarantees**.
+* **Limits quota** → Controls **what pods are allowed to consume at runtime**.
+* Both are needed to **prevent overcommit** and ensure fair resource usage.
+
+> ✅ Requests = scheduling guarantee, Limits = runtime cap. ResourceQuota enforces both at **namespace level**.
+
+---
+
+# 🔹 **5. Visual Analogy**
+
+```
+Namespace quota:
+Requests CPU = 2
+Limits CPU   = 4
+
+Pods:
+Pod1: request 0.5, limit 2
+Pod2: request 0.5, limit 2
+Pod3: request 0.5, limit 2
+Pod4: request 0.5, limit 2
+```
+
+* Requests total = 2 ✅ Allowed
+* Limits total = 8 ❌ Exceeds namespace limit → Not allowed
+
+---
+
 
