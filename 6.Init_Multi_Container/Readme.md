@@ -206,7 +206,9 @@ Hello from sidecar!
 ---
 <img width="1076" height="195" alt="image" src="https://github.com/user-attachments/assets/aec208aa-d48f-4741-a4fb-e4b0c03bc82a" />
 
+<img width="910" height="168" alt="image" src="https://github.com/user-attachments/assets/a27c720d-0797-493b-b113-27184e40f685" />
 
+<img width="545" height="195" alt="image" src="https://github.com/user-attachments/assets/dc6f6c78-011e-4f4e-85a5-608375e309f3" />
 
 ---
 
@@ -295,6 +297,7 @@ This demonstrates how the sidecar has access to the files created by the main co
 * Both patterns make Pods **more powerful & flexible**.
 
 ---
+
 
 
 
