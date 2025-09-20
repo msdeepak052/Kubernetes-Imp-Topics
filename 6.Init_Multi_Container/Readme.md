@@ -67,6 +67,12 @@ kubectl apply -f init-demo.yaml
 kubectl describe pod init-demo
 ```
 
+<img width="1225" height="199" alt="image" src="https://github.com/user-attachments/assets/f002cd9a-267a-4dcc-9873-fb5982b10892" />
+
+<img width="1383" height="388" alt="image" src="https://github.com/user-attachments/assets/03147fe2-b9c9-4888-ad5e-01e200fe0e30" />
+
+<img width="802" height="77" alt="image" src="https://github.com/user-attachments/assets/88b9baa6-384c-4d22-92d4-e8b44b53bdea" />
+
 ---
 
 ```yaml
@@ -281,5 +287,6 @@ This demonstrates how the sidecar has access to the files created by the main co
 * Both patterns make Pods **more powerful & flexible**.
 
 ---
+
 
 
