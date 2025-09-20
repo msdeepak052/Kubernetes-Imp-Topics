@@ -200,8 +200,9 @@ spec:
     pods: "10"
 ```
 
-If you just write `my-app` inside the **same namespace**, Kubernetes resolves it automatically.
-If you’re in a **different namespace**, you must use the FQDN.
+> If you just write `my-app` inside the **same namespace**, Kubernetes resolves it automatically.
+
+> If you’re in a **different namespace**, you must use the FQDN.
 
 ## Best Practices
 
