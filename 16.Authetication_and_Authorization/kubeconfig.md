@@ -272,7 +272,7 @@ users:
 
 ---
 
-Nice 👍 let’s walk through how **AWS (EKS) + Azure (AKS)** clusters can live inside a **single kubeconfig file**, and how you switch between them.
+👍 Let’s walk through how **AWS (EKS) + Azure (AKS)** clusters can live inside a **single kubeconfig file**, and how you switch between them.
 
 ---
 
@@ -391,5 +391,6 @@ Sometimes you don’t want to merge. You can:
 ---
 
 ✅ This way you can manage **multiple cloud clusters (AWS, Azure, GCP, on-prem)** all from **one kubeconfig file**.
+
 
 
