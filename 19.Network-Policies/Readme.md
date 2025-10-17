@@ -62,6 +62,19 @@ spec:
     image: nginx
     ports:
     - containerPort: 80
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend
+  namespace: netpol-demo
+spec:
+  selector:
+    app: backend
+  ports:
+  - port: 80
+    targetPort: 80
 ```
 
 ### Deploy Frontend Pod
@@ -80,6 +93,20 @@ spec:
   - name: frontend
     image: curlimages/curl
     command: ["sleep", "3600"]
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend
+  namespace: netpol-demo
+spec:
+  selector:
+    app: frontend
+  ports:
+  - port: 80
+    targetPort: 80
+
+
 ```
 
 Apply both:
