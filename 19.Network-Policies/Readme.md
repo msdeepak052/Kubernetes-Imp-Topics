@@ -29,7 +29,9 @@ For example:
 If you’re using **Minikube**, enable Calico:
 
 ```bash
-minikube start --cni=calico
+minikube delete  # optional clean start
+
+minikube start --nodes 2 --cpus 4 --memory 8192 --driver=docker --cni=calico
 ```
 
 ---
