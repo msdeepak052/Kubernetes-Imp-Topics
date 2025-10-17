@@ -1,9 +1,5 @@
 # Kubernetes Network Policies
 
-Let’s go **step by step** — with a **clear explanation + hands-on demo** that you can run in your Kubernetes cluster (like EKS, Minikube, or K3s).
-
----
-
 ## 🧠 1. What is a Network Policy?
 
 By default — **all Pods can communicate with all other Pods** in a Kubernetes cluster.
@@ -25,6 +21,10 @@ For example:
 * Cilium ✅
 * Weave Net ✅
 * AWS VPC CNI ❌ (by default, doesn’t support policies; Calico can be added for that)
+* kindnet (kind or minikube by default uses kindnet) ❌
+
+<img width="1317" height="825" alt="image" src="https://github.com/user-attachments/assets/f0f32b0f-1a7b-4a7a-85e5-287026165021" />
+
 
 If you’re using **Minikube**, enable Calico:
 
