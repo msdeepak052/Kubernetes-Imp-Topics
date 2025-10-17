@@ -125,6 +125,8 @@ kubectl exec -n netpol-demo frontend -- curl -s backend
 
 ✅ You’ll see the **HTML output** from Nginx — meaning communication is working.
 
+<img width="1504" height="842" alt="image" src="https://github.com/user-attachments/assets/d2985424-8e98-4d2f-bf41-1f0ebc54c32f" />
+
 ---
 
 ## 🔒 5. Apply a NetworkPolicy to Restrict Traffic
@@ -159,6 +161,7 @@ Apply:
 ```bash
 kubectl apply -f allow-frontend-to-backend.yaml
 ```
+<img width="1238" height="79" alt="image" src="https://github.com/user-attachments/assets/0c8a5b11-dd52-484a-9dcf-39729f5997c7" />
 
 ---
 
@@ -169,6 +172,7 @@ kubectl apply -f allow-frontend-to-backend.yaml
 ```bash
 kubectl exec -n netpol-demo frontend -- curl -s backend
 ```
+<img width="1288" height="584" alt="image" src="https://github.com/user-attachments/assets/e1d5600b-138c-484d-ae39-a1134b10de59" />
 
 👉 Should work.
 
@@ -179,6 +183,7 @@ kubectl run attacker -n netpol-demo --image=curlimages/curl -it -- sh
 # Inside pod:
 curl backend
 ```
+<img width="1920" height="261" alt="image" src="https://github.com/user-attachments/assets/27063a3c-d9e2-464a-93ea-77afd70d362c" />
 
 👉 Should **hang or fail** — blocked by the policy.
 
