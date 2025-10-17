@@ -1,0 +1,23 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: nginx-ingress
+  annotations:
+    cert-manager.io/cluster-issuer: selfsigned-cluster-issuer
+spec:
+  ingressClassName: nginx
+  tls:
+  - hosts:
+    - devopswithdeepak.site
+    secretName: devopsdeepak-tls
+  rules:
+  - host: devopswithdeepak.site
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: nginx-service
+            port:
+              number: 80
