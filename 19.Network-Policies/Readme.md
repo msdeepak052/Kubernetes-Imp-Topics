@@ -33,6 +33,7 @@ minikube delete  # optional clean start
 
 minikube start --nodes 2 --cpus 4 --memory 8192 --driver=docker --cni=calico
 ```
+<img width="1064" height="375" alt="image" src="https://github.com/user-attachments/assets/bed73eb5-5700-465d-a9fb-496219442163" />
 
 ---
 
