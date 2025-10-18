@@ -13,7 +13,9 @@ It is deployed as a **Kubernetes Deployment**, and runs as **pods** in the **`ku
 > In simple terms: CoreDNS enables **pods and services** in Kubernetes to find and talk to each other **by name**, not IP.
 
 [CoreDNS Administration Guide](https://kubernetes.io/docs/tasks/administer-cluster/coredns/)
+
 [DNS Debugging and Resolution Guide](https://kubernetes.io/docs/tasks/administer-cluster/dns-debugging-resolution/)
+
 
 ---
 
