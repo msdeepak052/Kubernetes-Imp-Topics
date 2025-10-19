@@ -327,26 +327,73 @@ systemctl restart kubelet
 
 ### **Scenario 11: API Server Not Reachable**
 
-**Symptoms:**
+**Clarification:**
 
-* `kubectl get pods` fails with `Unable to connect to the server`
+* If the **API server is completely down**, `kubectl` commands **cannot communicate with the cluster at all**. You will see errors like:
 
-**Troubleshooting:**
-
-* Check control plane components
-
-```bash
-kubectl get pods -n kube-system
-kubectl get componentstatus
+```
+Unable to connect to the server: dial tcp <API-server-IP>:6443: i/o timeout
 ```
 
-* Check API server logs:
+* In this case, you **cannot use `kubectl`** to check pods, components, or HPA because `kubectl` relies on the API server.
+
+---
+
+### **Correct Troubleshooting Approach When API Server Is Down**
+
+1. **Check the API server process on the control plane node:**
 
 ```bash
-journalctl -u kube-apiserver
+# On master/control plane node
+sudo systemctl status kube-apiserver
 ```
 
-* Network/firewall issues
+or, if using static pods:
+
+```bash
+docker ps | grep kube-apiserver
+```
+
+or for containerd:
+
+```bash
+crictl ps | grep kube-apiserver
+```
+
+2. **Check API server logs:**
+
+```bash
+sudo journalctl -u kube-apiserver
+# or
+docker logs kube-apiserver
+```
+
+3. **Check etcd health:**
+   API server depends on etcd; if etcd is down, API server won’t function.
+
+```bash
+ETCDCTL_API=3 etcdctl --endpoints=<etcd-endpoint> endpoint health
+```
+
+4. **Check control plane node resources:**
+
+* Disk full, CPU, or memory exhaustion can cause API server failure.
+
+5. **Network issues:**
+
+* Ensure the kube-apiserver port (default 6443) is reachable from your node where kubectl is running:
+
+```bash
+telnet <API-server-IP> 6443
+```
+
+---
+
+### **Key Point**
+
+* If the API server is down, **kubectl will not work**.
+* Troubleshooting must be done **directly on the control plane node**, using logs, processes, and etcd health checks.
+* Once API server is restored, `kubectl` will start working again.
 
 ---
 
@@ -700,5 +747,6 @@ kubectl top pods
 4. Fix the issue one by one and note how each tool helps troubleshoot
 
 ---
+
 
 
