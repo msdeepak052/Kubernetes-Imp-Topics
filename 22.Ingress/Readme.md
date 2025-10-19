@@ -83,8 +83,11 @@ minikube addons enable ingress
 
 ### **Step 2: Verify Ingress Controller is running**
 
+
+
 ```bash
-kubectl get pods -n kube-system | grep ingress
+kubectl get ns # ingress-nginx
+kubectl get pods -n ingress-nginx
 ```
 
 You should see something like:
@@ -264,3 +267,4 @@ Now open:
 
 Would you like me to show how to **enable path-based routing** (like `/app1` and `/app2` on the same hostname instead of separate domains)?
 That’s another common pattern used in production setups.
+
