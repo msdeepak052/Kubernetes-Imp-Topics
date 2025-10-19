@@ -1,7 +1,5 @@
 # Comprehensive JSONPath tutorial
 
----
-
 # **🔹 JSONPath in Kubernetes**
 
 **JSONPath** is a query language for extracting specific fields from JSON-formatted data.
@@ -203,3 +201,4 @@ kubectl get endpoints <service> -o jsonpath='{.subsets[*].addresses[*].ip}'
 | Service ports     | `kubectl get svc <svc> -o jsonpath='{.spec.ports[*].port}'`                                         |
 
 ---
+
