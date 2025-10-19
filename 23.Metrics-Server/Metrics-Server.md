@@ -176,6 +176,204 @@ kubectl get hpa -w
 
 ---
 
-If you want, I can create a **ready-to-run manifest specifically for kubeadm clusters** with `--kubelet-insecure-tls` already included, so you just apply it.
+### Full hands-on HPA demo
+---
 
-Do you want me to do that?
+## **1️⃣ Prerequisites**
+
+* Kubernetes cluster (kubeadm or Minikube)
+* Metrics Server installed and working (`kubectl top nodes` shows metrics)
+* `kubectl` configured
+
+---
+
+## **2️⃣ Step 1 — Create Deployment**
+
+We’ll deploy a simple **Nginx app** that HPA can scale.
+
+**File: `webapp-deployment.yaml`**
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: webapp
+  labels:
+    app: webapp
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: webapp
+  template:
+    metadata:
+      labels:
+        app: webapp
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:stable
+        resources:
+          requests:
+            cpu: 100m
+          limits:
+            cpu: 500m
+        ports:
+        - containerPort: 80
+```
+
+**Deploy it:**
+
+```bash
+kubectl apply -f webapp-deployment.yaml
+```
+
+---
+
+## **3️⃣ Step 2 — Expose Deployment via Service**
+
+**File: `webapp-service.yaml`**
+
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: webapp-service
+spec:
+  selector:
+    app: webapp
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+  type: ClusterIP
+```
+
+**Apply:**
+
+```bash
+kubectl apply -f webapp-service.yaml
+```
+
+---
+
+## **4️⃣ Step 3 — Create Horizontal Pod Autoscaler**
+
+We’ll autoscale based on CPU usage.
+
+**File: `webapp-hpa.yaml`**
+
+```yaml
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: webapp-hpa
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: webapp
+  minReplicas: 1
+  maxReplicas: 5
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 50
+```
+
+**Apply HPA:**
+
+```bash
+kubectl apply -f webapp-hpa.yaml
+```
+
+---
+
+## **5️⃣ Step 4 — Verify HPA and Metrics**
+
+Check HPA:
+
+```bash
+kubectl get hpa
+```
+
+Expected output (initially, replicas = 1):
+
+```
+NAME         REFERENCE       TARGETS   MINPODS   MAXPODS   REPLICAS   AGE
+webapp-hpa   Deployment/webapp  0%/50%    1         5         1          1m
+```
+
+Check pod CPU usage:
+
+```bash
+kubectl top pods
+kubectl top nodes
+```
+
+---
+
+## **6️⃣ Step 5 — Generate Load**
+
+Create a temporary pod to stress Nginx:
+
+```bash
+kubectl run load-generator --rm -i --tty --image=busybox /bin/sh
+```
+
+Inside the pod, run:
+
+```bash
+while true; do wget -q -O- http://webapp-service.default.svc.cluster.local; done
+```
+
+✅ This generates CPU usage for your Nginx pods.
+
+---
+
+## **7️⃣ Step 6 — Watch HPA Scale Up**
+
+In another terminal:
+
+```bash
+kubectl get hpa -w
+```
+
+* You will see `CURRENT CPU%` increase
+* HPA will **increase replicas** automatically (up to maxReplicas = 5)
+
+You can also watch pods:
+
+```bash
+kubectl get pods -w
+```
+
+---
+
+## **8️⃣ Step 7 — Clean Up**
+
+After demo:
+
+```bash
+kubectl delete -f webapp-hpa.yaml
+kubectl delete -f webapp-service.yaml
+kubectl delete -f webapp-deployment.yaml
+kubectl delete pod load-generator
+```
+
+---
+
+### **✅ Key Learning Points**
+
+1. **Metrics Server is required** for HPA.
+2. HPA scales **deployment pods** automatically based on **metrics**.
+3. CPU utilization triggers scaling — you can also use **memory or custom metrics**.
+4. `kubectl top pods` is essential for verifying metrics.
+
+---
+
+
+
