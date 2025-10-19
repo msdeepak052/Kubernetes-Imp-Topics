@@ -389,6 +389,89 @@ telnet <API-server-IP> 6443
 
 ---
 
+### **Where Kubernetes Manifests Reside**
+
+1. **Static Pod Manifests (Control Plane Components)**
+
+On a **kubeadm cluster**, the **control plane components** like `kube-apiserver`, `kube-controller-manager`, `kube-scheduler` are run as **static pods**. Their manifests are stored in:
+
+```
+/etc/kubernetes/manifests/
+```
+
+Files you will typically see:
+
+```
+kube-apiserver.yaml
+kube-controller-manager.yaml
+kube-scheduler.yaml
+etcd.yaml
+```
+
+* The **kubelet** watches this directory.
+* Any YAML file here is automatically started as a pod by kubelet.
+* You do **not need `kubectl`** to run these pods — kubelet manages them.
+
+**Example:**
+
+```bash
+ls -l /etc/kubernetes/manifests/
+-rw------- 1 root root  1234 Oct 18 10:00 kube-apiserver.yaml
+-rw------- 1 root root  1100 Oct 18 10:00 kube-controller-manager.yaml
+-rw------- 1 root root  1200 Oct 18 10:00 kube-scheduler.yaml
+-rw------- 1 root root  1500 Oct 18 10:00 etcd.yaml
+```
+
+---
+
+2. **Node-level kubelet static pods**
+
+* Static pod manifests on worker nodes (rare) can also reside in `/etc/kubernetes/manifests/` if you are running something like a self-managed cluster.
+
+---
+
+3. **Application Manifests (User Workloads)**
+
+* These reside wherever you store them on your machine.
+
+* Examples:
+
+  * `/home/deepak/k8s-lab/webapp-deployment.yaml`
+  * `/home/deepak/k8s-lab/webapp-service.yaml`
+  * `/home/deepak/k8s-lab/webapp-hpa.yaml`
+
+* You **apply them with `kubectl apply -f <file>`**.
+
+* Kubernetes does not “watch” these files; it only reads them when you apply them.
+
+---
+
+### **Why This Matters for Troubleshooting**
+
+1. If **API server is down**, you **cannot use `kubectl`**, so you have to check `/etc/kubernetes/manifests/` to see if the control plane pods are properly defined.
+2. If a manifest is **misconfigured**, the kubelet will keep restarting the static pod.
+3. Logs for static pods can be checked via:
+
+```bash
+docker ps | grep kube-apiserver
+docker logs <container-id>
+# or using crictl if containerd
+crictl ps
+crictl logs <container-id>
+```
+
+---
+
+✅ **Key Takeaways**
+
+* **Control plane manifests:** `/etc/kubernetes/manifests/` (static pods managed by kubelet)
+* **User workload manifests:** any location on your filesystem; applied via `kubectl`
+* **Static pods start automatically**; no kubectl needed
+* **kubectl only works if API server is running**
+
+---
+
+
 ### **Key Point**
 
 * If the API server is down, **kubectl will not work**.
@@ -747,6 +830,7 @@ kubectl top pods
 4. Fix the issue one by one and note how each tool helps troubleshoot
 
 ---
+
 
 
 
