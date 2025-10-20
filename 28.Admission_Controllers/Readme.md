@@ -164,12 +164,73 @@ CMD ["python3", "validate-pod.py"]
 
 # **3️⃣ TLS Certificates**
 
-Generate self-signed certs (only once):
+The error you're encountering is because Kubernetes 1.19+ requires TLS certificates to use Subject Alternative Names (SANs) instead of relying solely on the Common Name (CN) field. Let's fix this:
+
+## 🔧 Fixing the TLS Certificate Issue
+
+### **Updated TLS Certificate Generation**
+
+Replace your current TLS certificate generation with this:
 
 ```bash
-mkdir tls
-openssl req -newkey rsa:2048 -nodes -keyout tls/tls.key -x509 -days 365 -out tls/tls.crt -subj "/CN=pod-validator.webhook-demo.svc"
+# Clean up existing certificates
+rm -rf tls/*
+mkdir -p tls
+
+# Generate a proper certificate with SAN
+openssl req -newkey rsa:2048 -nodes -keyout tls/tls.key \
+  -x509 -days 365 -out tls/tls.crt \
+  -subj "/CN=pod-validator.webhook-demo.svc" \
+  -addext "subjectAltName = DNS:pod-validator.webhook-demo.svc,DNS:pod-validator.webhook-demo.svc.cluster.local"
 ```
+
+### **Alternative Method (Using Config File)**
+
+If the above doesn't work, create a config file:
+
+**1. Create `tls/openssl.cnf`:**
+```ini
+[req]
+distinguished_name = req_distinguished_name
+x509_extensions = v3_req
+prompt = no
+
+[req_distinguished_name]
+CN = pod-validator.webhook-demo.svc
+
+[v3_req]
+keyUsage = keyEncipherment, dataEncipherment
+extendedKeyUsage = serverAuth
+subjectAltName = @alt_names
+
+[alt_names]
+DNS.1 = pod-validator.webhook-demo.svc
+DNS.2 = pod-validator.webhook-demo.svc.cluster.local
+```
+
+**2. Generate certificate using config:**
+```bash
+openssl req -newkey rsa:2048 -nodes -keyout tls/tls.key \
+  -x509 -days 365 -out tls/tls.crt \
+  -config tls/openssl.cnf
+```
+
+### **Verify the Certificate**
+
+Check that SAN is properly included:
+
+```bash
+openssl x509 -in tls/tls.crt -text -noout | grep -A 1 "Subject Alternative Name"
+```
+
+You should see output like:
+```
+X509v3 Subject Alternative Name: 
+    DNS:pod-validator.webhook-demo.svc, DNS:pod-validator.webhook-demo.svc.cluster.local
+```
+
+
+The TLS certificate with proper SAN configuration should resolve the connection issue, and your webhook should properly validate pods based on the `runAsNonRoot` security context requirement.
 
 > CN must match the service name in Kubernetes.
 
@@ -347,6 +408,7 @@ This webhook:
 * You can extend it for other policies like **image repo restrictions**, **resource limits**, or **required labels**.
 
 ---
+
 
 
 
