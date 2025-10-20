@@ -86,16 +86,27 @@ We’ll enforce this using a **Validating Admission Webhook**.
 
 ## 🧩 7. Demo Setup — Step by Step
 
-> You can perform this in Minikube, Kind, or EKS (with permissions).
+# **Repository Structure**
+
+```
+k8s-admission-webhook/
+├── README.md
+├── Dockerfile
+├── validate-pod.py
+├── tls/
+│   ├── tls.crt
+│   └── tls.key
+├── deployment.yaml
+├── service.yaml
+├── validating-webhook.yaml
+├── test-pods/
+│   ├── bad-pod.yaml
+│   └── good-pod.yaml
+```
 
 ---
 
-### **Step 1: Create a Validation Webhook Server**
-
-We’ll write a small webhook server that checks if a Pod’s `securityContext.runAsNonRoot=true`.
-If not, the request will be **denied**.
-
-📁 `validate-pod.py`
+# **1️⃣ validate-pod.py**
 
 ```python
 from flask import Flask, request, jsonify
@@ -108,6 +119,7 @@ def validate():
     uid = req["request"]["uid"]
     allowed = True
     msg = "Pod is valid"
+
     pod_spec = req["request"]["object"]["spec"]
     containers = pod_spec.get("containers", [])
 
@@ -126,27 +138,44 @@ def validate():
     return jsonify(response)
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=443, ssl_context=('tls.crt', 'tls.key'))
+    app.run(host='0.0.0.0', port=443, ssl_context=('/certs/tls.crt', '/certs/tls.key'))
 ```
 
 ---
 
-### **Step 2: Create TLS Certificate for the Webhook**
+# **2️⃣ Dockerfile**
+
+```dockerfile
+FROM python:3.11-slim
+
+WORKDIR /app
+
+COPY validate-pod.py /app/
+COPY tls/ /certs/
+
+RUN pip install flask
+
+EXPOSE 443
+
+CMD ["python3", "validate-pod.py"]
+```
+
+---
+
+# **3️⃣ TLS Certificates**
+
+Generate self-signed certs (only once):
 
 ```bash
-# Create namespace
-kubectl create ns webhook-demo
-
-# Create certs
-openssl req -newkey rsa:2048 -nodes -keyout tls.key -x509 -days 365 -out tls.crt -subj "/CN=pod-validator.webhook-demo.svc"
-kubectl create secret tls webhook-tls --cert=tls.crt --key=tls.key -n webhook-demo
+mkdir tls
+openssl req -newkey rsa:2048 -nodes -keyout tls/tls.key -x509 -days 365 -out tls/tls.crt -subj "/CN=pod-validator.webhook-demo.svc"
 ```
+
+> CN must match the service name in Kubernetes.
 
 ---
 
-### **Step 3: Deploy the Webhook Server**
-
-📁 `deployment.yaml`
+# **4️⃣ deployment.yaml**
 
 ```yaml
 apiVersion: apps/v1
@@ -166,40 +195,32 @@ spec:
     spec:
       containers:
       - name: validator
-        image: python:3.9
-        command: ["python3", "-u", "validate-pod.py"]
-        volumeMounts:
-        - name: webhook-code
-          mountPath: /app
-        - name: tls-certs
-          mountPath: /certs
-        workingDir: /app
-      volumes:
-      - name: webhook-code
-        hostPath:
-          path: /path/to/code  # adjust path
-      - name: tls-certs
-        secret:
-          secretName: webhook-tls
+        image: <your-dockerhub-username>/pod-validator:1.0
+        ports:
+        - containerPort: 443
+```
+
 ---
+
+# **5️⃣ service.yaml**
+
+```yaml
 apiVersion: v1
 kind: Service
 metadata:
   name: pod-validator
   namespace: webhook-demo
 spec:
-  ports:
-  - port: 443
-    targetPort: 443
   selector:
     app: pod-validator
+  ports:
+    - port: 443
+      targetPort: 443
 ```
 
 ---
 
-### **Step 4: Create the ValidatingWebhookConfiguration**
-
-📁 `validating-webhook.yaml`
+# **6️⃣ validating-webhook.yaml**
 
 ```yaml
 apiVersion: admissionregistration.k8s.io/v1
@@ -218,21 +239,24 @@ webhooks:
         name: pod-validator
         namespace: webhook-demo
         path: "/validate"
-      caBundle: <BASE64_ENCODED_CA_CERT>
+      caBundle: <BASE64_ENCODED_TLS_CRT>
     admissionReviewVersions: ["v1"]
     sideEffects: None
 ```
 
-> Replace `<BASE64_ENCODED_CA_CERT>` with:
-> `cat tls.crt | base64 | tr -d '\n'`
+**Generate CA bundle:**
+
+```bash
+cat tls/tls.crt | base64 | tr -d '\n'
+```
+
+Paste into `caBundle`.
 
 ---
 
-### **Step 5: Test the Policy**
+# **7️⃣ Test Pods**
 
-#### 🚫 Pod without runAsNonRoot
-
-📁 `bad-pod.yaml`
+`test-pods/bad-pod.yaml` → should fail:
 
 ```yaml
 apiVersion: v1
@@ -245,21 +269,7 @@ spec:
     image: nginx
 ```
 
-Apply it:
-
-```bash
-kubectl apply -f bad-pod.yaml
-```
-
-➡️ Result:
-
-```
-Error from server (Container 'nginx' must set runAsNonRoot=true)
-```
-
-#### ✅ Pod with runAsNonRoot
-
-📁 `good-pod.yaml`
+`test-pods/good-pod.yaml` → should pass:
 
 ```yaml
 apiVersion: v1
@@ -274,16 +284,36 @@ spec:
       runAsNonRoot: true
 ```
 
-Apply it:
+---
+
+# **8️⃣ Steps to Deploy**
+
+1. **Create namespace**
 
 ```bash
-kubectl apply -f good-pod.yaml
+kubectl create namespace webhook-demo
 ```
 
-➡️ Result:
+2. **Build and push Docker image**
 
+```bash
+docker build -t <your-dockerhub-username>/pod-validator:1.0 .
+docker push <your-dockerhub-username>/pod-validator:1.0
 ```
-pod/goodpod created
+
+3. **Deploy webhook server**
+
+```bash
+kubectl apply -f deployment.yaml
+kubectl apply -f service.yaml
+kubectl apply -f validating-webhook.yaml
+```
+
+4. **Test**
+
+```bash
+kubectl apply -f test-pods/bad-pod.yaml  # Should fail
+kubectl apply -f test-pods/good-pod.yaml # Should succeed
 ```
 
 ---
@@ -311,6 +341,12 @@ This webhook:
 | Real-life need        | Enforce security, compliance, labeling, resource limits |
 | Demo outcome          | Prevent running pods as root automatically              |
 
+* The **webhook blocks pods running as root**.
+* Using a **Docker image** removes hostPath and working dir issues.
+* This setup is **production-ready**, portable, and versioned.
+* You can extend it for other policies like **image repo restrictions**, **resource limits**, or **required labels**.
+
 ---
+
 
 
