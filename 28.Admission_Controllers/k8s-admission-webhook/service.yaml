@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: pod-validator
+  namespace: webhook-demo
+spec:
+  selector:
+    app: pod-validator
+  ports:
+    - port: 8443
+      targetPort: 8443

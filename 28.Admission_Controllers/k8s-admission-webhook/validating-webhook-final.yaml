@@ -1,0 +1,26 @@
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingWebhookConfiguration
+metadata:
+  name: pod-validator
+webhooks:
+  - name: pod-validator.webhook-demo.svc
+    rules:
+      - apiGroups: [""]
+        apiVersions: ["v1"]
+        operations: ["CREATE"]
+        resources: ["pods"]
+    clientConfig:
+      service:
+        name: pod-validator
+        namespace: webhook-demo
+        path: "/validate"
+        port: 8443
+      caBundle: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURxakNDQXBLZ0F3SUJBZ0lVZU5UZVVmYVpLSDY2b2YwM2VCR2thbVEvZ2Jvd0RRWUpLb1pJaHZjTkFRRUwKQlFBd0tURW5NQ1VHQTFVRUF3d2VjRzlrTFhaaGJHbGtZWFJ2Y2k1M1pXSm9iMjlyTFdSbGJXOHVjM1pqTUI0WApEVEkxTVRBeU1ERTVNVGcwT0ZvWERUSTJNVEF5TURFNU1UZzBPRm93S1RFbk1DVUdBMVVFQXd3ZWNHOWtMWFpoCmJHbGtZWFJ2Y2k1M1pXSm9iMjlyTFdSbGJXOHVjM1pqTUlJQklqQU5CZ2txaGtpRzl3MEJBUUVGQUFPQ0FROEEKTUlJQkNnS0NBUUVBME8wenJlVlgzZjQ1YXVFUzlqWlNpZy94ZnBrS1N6WTYycEFIOWNLRnJDa0VrMEZSRFhzegpQdEFNYkg0OVhISzlVVWFwVFl3OHhSKzBrWjcyUVpJM0txM3hmMG5lSTVLU1IvL3dCemVsaHBUNE1hSm9hcXFlCmZNWGhGZWxYczFubG1ramhZRTZ0K2JUQ1NRTkhvUThRdjFlcEpJZ05pQkhnR1k2UmJCMjV3Rjc5SHdMVGZmazkKUEhlbjBQbmJhRXNibGZNVFFZVlNyYW9ZTFZ0QnpraldZUTYyS0JpSXNRVkJuU0ZuWEpKMFNCSTBsdEN4SmZDbQpCYTRjSTR6WXFCZDhtS29Oand2RjU5aWp4c0dwSGlkSGpmSy9heXMva2dWTHdCeVRkcG5EQzl2UEZPWGs5blc2CnF1bnlpRjJKNE1MM3ZUWEJrQkUrdG9ReGkvWUFGVFdNYlFJREFRQUJvNEhKTUlIR01Bc0dBMVVkRHdRRUF3SUUKc0RBVEJnTlZIU1VFRERBS0JnZ3JCZ0VGQlFjREFUQ0JnZ1lEVlIwUkJIc3dlWUlOY0c5a0xYWmhiR2xrWVhSdgpjb0lhY0c5a0xYWmhiR2xrWVhSdmNpNTNaV0pvYjI5ckxXUmxiVytDSG5CdlpDMTJZV3hwWkdGMGIzSXVkMlZpCmFHOXZheTFrWlcxdkxuTjJZNElzY0c5a0xYWmhiR2xrWVhSdmNpNTNaV0pvYjI5ckxXUmxiVzh1YzNaakxtTnMKZFhOMFpYSXViRzlqWVd3d0hRWURWUjBPQkJZRUZPTFpSdXJXcXozcjRuTDdaSnpMY0F0YUZpOGNNQTBHQ1NxRwpTSWIzRFFFQkN3VUFBNElCQVFBelg1UHdyTDJTNzJUczg1Rk9pcWQxVW45dHphL2dJd3RBblRMOXRqS2cwKzlzCk1URC8rWjR5QksrRk8xVEZSZk80OGVRYkc0S3FvMHdORjdOL1FPaWJKQ0xaR1psQ3ZLT1V4SHZjNWNwd0M3QUoKZkIxWmppWmhrZVQrd3hCbkFabThXWXZrT1pPakxUbUlWUWxtQUJTNFljZytzU21MMUFjSE56anVRUTI2aktCTQp4ZEFxSW1Ea1hPSU1tOFlmLzhneUlkOWU0UC9KSDc5ajl3cTlHc1RvOGFkUG9RMnFjTk1ZU3pvUUZhNnc3ejVsCk91NEx3STVlN3hobnZlUURVQVBPbHo5dFdUeHhHdlVtaFJBdnY4S2ZWcVlsTXh4ZmF1L01udTdoWEZnWU5ZTE8KaDBweldDZENCM0dCbEgwa255SnV2UElDWWpGampVc1Z1OFRqNldYVQotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0tCg==
+    admissionReviewVersions: ["v1"]
+    sideEffects: None
+    timeoutSeconds: 10
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: NotIn
+          values: [webhook-demo]
