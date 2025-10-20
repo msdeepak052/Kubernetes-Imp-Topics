@@ -733,6 +733,7 @@ kubectl top pods -n image-validator-demo
 # Test ad-hoc
 kubectl run test-pod --image=nginx:latest --dry-run=client -o yaml | kubectl apply -f -
 ```
+<img width="1132" height="393" alt="image" src="https://github.com/user-attachments/assets/1772a069-f6b9-4f82-ab91-eb583417b3ce" />
 
 ---
 
@@ -743,9 +744,17 @@ kubectl run test-pod --image=nginx:latest --dry-run=client -o yaml | kubectl app
 - ❌ `bad-pod-latest-tag`: "Tag 'latest' is blocked. Use specific version tags."
 - ❌ `bad-pod-no-resources`: "Missing CPU limits, memory limits, CPU requests, memory requests"
 
+<img width="1155" height="324" alt="image" src="https://github.com/user-attachments/assets/2d51d7c4-7d93-4f43-b9ba-af02aa93f306" />
+
+
 **Good pod should be created successfully:**
 - ✅ `good-pod`: Pod created without issues
 
+```bash
+deepak@DeepakRK:~/Kubernetes-Imp-Topics/28.Admission_Controllers/k8s-admission-webhook/2.Demo-ImageValidation/k8s-image-validator$ kubectl apply -f test-pods/good-pod.yaml
+pod/good-pod created
+deepak@DeepakRK:~/Kubernetes-Imp-Topics/28.Admission_Controllers/k8s-admission-webhook/2.Demo-ImageValidation/k8s-image-validator$
+```
 ---
 
 ## 🔧 **Real-World Use Cases**
