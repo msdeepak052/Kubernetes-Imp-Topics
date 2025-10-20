@@ -23,6 +23,7 @@ kubectl → API Server
   → etcd (persistent store)
 ```
 <img width="1473" height="520" alt="image" src="https://github.com/user-attachments/assets/269cd592-c479-4451-922c-7856d765ff68" />
+<img width="1591" height="513" alt="image" src="https://github.com/user-attachments/assets/63745d24-8684-4120-afe0-36d0e5752f1a" />
 
 ---
 
@@ -311,4 +312,5 @@ This webhook:
 | Demo outcome          | Prevent running pods as root automatically              |
 
 ---
+
 
