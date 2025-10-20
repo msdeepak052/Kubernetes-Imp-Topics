@@ -297,8 +297,8 @@ kubectl create namespace webhook-demo
 2. **Build and push Docker image**
 
 ```bash
-docker build -t <your-dockerhub-username>/pod-validator:1.0 .
-docker push <your-dockerhub-username>/pod-validator:1.0
+docker build -t devopsdktraining/pod-validator:1.0 .
+docker push devopsdktraining/pod-validator:1.0
 ```
 
 3. **Deploy webhook server**
@@ -347,6 +347,7 @@ This webhook:
 * You can extend it for other policies like **image repo restrictions**, **resource limits**, or **required labels**.
 
 ---
+
 
 
 
