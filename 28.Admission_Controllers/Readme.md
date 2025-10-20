@@ -22,6 +22,7 @@ kubectl → API Server
        └─ Validating Admission Controllers (can validate or deny)
   → etcd (persistent store)
 ```
+<img width="1473" height="520" alt="image" src="https://github.com/user-attachments/assets/269cd592-c479-4451-922c-7856d765ff68" />
 
 ---
 
@@ -310,3 +311,4 @@ This webhook:
 | Demo outcome          | Prevent running pods as root automatically              |
 
 ---
+
