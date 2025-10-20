@@ -138,7 +138,7 @@ def validate():
     return jsonify(response)
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=443, ssl_context=('/certs/tls.crt', '/certs/tls.key'))
+    app.run(host='0.0.0.0', port=8443, ssl_context=('/certs/tls.crt', '/certs/tls.key'))
 ```
 
 ---
@@ -155,7 +155,7 @@ COPY tls/ /certs/
 
 RUN pip install flask
 
-EXPOSE 443
+EXPOSE 8443
 
 CMD ["python3", "validate-pod.py"]
 ```
@@ -195,9 +195,9 @@ spec:
     spec:
       containers:
       - name: validator
-        image: <your-dockerhub-username>/pod-validator:1.0
+        image: devopsdktraining/pod-validator:1.0
         ports:
-        - containerPort: 443
+        - containerPort: 8443
 ```
 
 ---
@@ -214,8 +214,8 @@ spec:
   selector:
     app: pod-validator
   ports:
-    - port: 443
-      targetPort: 443
+    - port: 8443
+      targetPort: 8443
 ```
 
 ---
@@ -347,6 +347,7 @@ This webhook:
 * You can extend it for other policies like **image repo restrictions**, **resource limits**, or **required labels**.
 
 ---
+
 
 
 
