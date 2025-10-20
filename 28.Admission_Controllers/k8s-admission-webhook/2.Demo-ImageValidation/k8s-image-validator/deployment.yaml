@@ -1,21 +1,25 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: pod-validator
-  namespace: webhook-demo
+  name: image-validator
+  namespace: image-validator-demo
+  labels:
+    app: image-validator
+    version: v1
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
-      app: pod-validator
+      app: image-validator
   template:
     metadata:
       labels:
-        app: pod-validator
+        app: image-validator
+        version: v1
     spec:
       containers:
       - name: validator
-        image: devopsdktraining/pod-validator:4.0
+        image: devopsdktraining/image-validator:1.0
         ports:
         - containerPort: 8443
         volumeMounts:
@@ -50,7 +54,9 @@ spec:
         securityContext:
           runAsNonRoot: true
           runAsUser: 1000
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
       volumes:
       - name: certs
         secret:
-          secretName: webhook-certs
+          secretName: image-validator-certs

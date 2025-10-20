@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: bad-pod-no-resources
+  labels:
+    app: test-pod
+spec:
+  containers:
+  - name: nginx
+    image: nginx:1.25-alpine
+    # Missing resources section
+    securityContext:
+      runAsNonRoot: true
+      allowPrivilegeEscalation: false
+      readOnlyRootFilesystem: true

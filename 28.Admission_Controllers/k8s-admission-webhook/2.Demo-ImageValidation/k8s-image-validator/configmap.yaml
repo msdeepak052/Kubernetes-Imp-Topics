@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: image-validator-config
+  namespace: image-validator-demo
+data:
+  approved-registries: |
+    docker.io
+    gcr.io
+    k8s.gcr.io
+    quay.io
+    registry.k8s.io
+    ghcr.io
+  blocked-tags: |
+    latest
+  log-level: "INFO"

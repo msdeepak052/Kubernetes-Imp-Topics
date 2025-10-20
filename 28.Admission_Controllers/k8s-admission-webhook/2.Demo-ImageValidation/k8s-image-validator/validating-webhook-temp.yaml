@@ -1,0 +1,29 @@
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingWebhookConfiguration
+metadata:
+  name: image-validator
+  labels:
+    app: image-validator
+webhooks:
+  - name: image-validator.image-validator-demo.svc
+    clientConfig:
+      service:
+        name: image-validator
+        namespace: image-validator-demo
+        path: "/validate"
+        port: 8443
+      caBundle: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUQ0RENDQXNpZ0F3SUJBZ0lVYVFzc1BTS3hiTnIrOXlYaGFpcG5IYTU1MmVVd0RRWUpLb1pJaHZjTkFRRUwKQlFBd016RXhNQzhHQTFVRUF3d29hVzFoWjJVdGRtRnNhV1JoZEc5eUxtbHRZV2RsTFhaaGJHbGtZWFJ2Y2kxawpaVzF2TG5OMll6QWVGdzB5TlRFd01qQXhPVFU0TkRCYUZ3MHlOakV3TWpBeE9UVTROREJhTURNeE1UQXZCZ05WCkJBTU1LR2x0WVdkbExYWmhiR2xrWVhSdmNpNXBiV0ZuWlMxMllXeHBaR0YwYjNJdFpHVnRieTV6ZG1Nd2dnRWkKTUEwR0NTcUdTSWIzRFFFQkFRVUFBNElCRHdBd2dnRUtBb0lCQVFEZGxxYldLQU0vM1pVRDdnZFJwYlpvay9rdgovNDE4Z0dFOWRFbnp0T0pHNGFIOHdtWWlIcDNDVEE5R2FUUlMrMU5pc2pIdjcyeHhBV3ArRVgxdEg2d1lWZW44CnJXekh0K0kxd3MralovMERQaHFJQUtxM2RxbkJVSjBEaVJuUmlTVjhRM1U2dXhQNlpFUW5zcHRxcnJhelFZeXoKaDE4U2NONlA2RC8yTnhWU3hMZ2xFREkrSWNqejVJMjQvQUpERG91cHdENjVGV1psdDBZT2F6NHBhUTY2cklEOQo5N2FSWDRvZGpPNzVoRlVNZXN5VmQwd1FaWFM0YTRWak9zVmY0RWFxUnI5OGxQK0RDbGNaT2RhTHY2V0NERDR5CnNUaC9LQlE2UzdoWmFLR0xxNWFHVjROWHZZS210MlhnUHlEVlpDd3J1ODl0dUZFb3A0SlhjSVNxUFQrbEFnTUIKQUFHamdlc3dnZWd3Q3dZRFZSMFBCQVFEQWdTd01CTUdBMVVkSlFRTU1Bb0dDQ3NHQVFVRkJ3TUJNSUdrQmdOVgpIUkVFZ1p3d2dabUNEMmx0WVdkbExYWmhiR2xrWVhSdmNvSWthVzFoWjJVdGRtRnNhV1JoZEc5eUxtbHRZV2RsCkxYWmhiR2xrWVhSdmNpMWtaVzF2Z2locGJXRm5aUzEyWVd4cFpHRjBiM0l1YVcxaFoyVXRkbUZzYVdSaGRHOXkKTFdSbGJXOHVjM1pqZ2pacGJXRm5aUzEyWVd4cFpHRjBiM0l1YVcxaFoyVXRkbUZzYVdSaGRHOXlMV1JsYlc4dQpjM1pqTG1Oc2RYTjBaWEl1Ykc5allXd3dIUVlEVlIwT0JCWUVGTXdQNGVhdktmZ1ptNlZPdkQ0VmZ0S2V2YjN5Ck1BMEdDU3FHU0liM0RRRUJDd1VBQTRJQkFRQXpVMkRlZDN2KzJRUjVoQTdXRHFQd1RSY2wyRWhMMStjeWl0VjMKMWFHNEk3VnQvSFhKNUJVaWJ4a1Avdml5UDhVajIycWdGTUplbmRLVWZHa2YzMVREbFV1TzNSK21mdmN2MkY3eApvNmtMdGtzNjM2VGFLUjlkay9tVjUrU0J0TEhJSTVRN0RiSjBWeDVWOEw1K2FYUXlvUFhoQ1NCYVlHWC90YUJtCnBzeUk0bHh1cCtjM0JGT0pTbi8xWXNBTGk0ZTlWVTdJZEpoQU5SN2M3WmxjWSswbFo0Zkx2dm1rNTJtVXFKTGQKZC9wOGtOTU9mbDJTVVBDZ21BancxbjBrU1NYTlVSWlhRQXo1ZGhuMHlTeGZXNEZQRVRGM0NFTW1zQ0I3c0FVSAo2UmIvUXFseDJCR0sxbGEwOU1kWStXRUp0OWpDRnNUOGJkdlZVL0E2Nm5UeXRSc0QKLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQo=
+    rules:
+      - apiGroups: [""]
+        apiVersions: ["v1"]
+        operations: ["CREATE", "UPDATE"]
+        resources: ["pods"]
+    failurePolicy: Fail
+    sideEffects: None
+    admissionReviewVersions: ["v1"]
+    timeoutSeconds: 10
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: NotIn
+          values: [image-validator-demo, kube-system]

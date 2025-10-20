@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: bad-pod-unapproved-registry
+  labels:
+    app: test-pod
+spec:
+  containers:
+  - name: nginx
+    image: myprivate.registry.com/nginx:1.25  # Unapproved registry
+    resources:
+      requests:
+        memory: "64Mi"
+        cpu: "50m"
+      limits:
+        memory: "128Mi"
+        cpu: "100m"
+    securityContext:
+      runAsNonRoot: true
+      allowPrivilegeEscalation: false
+      readOnlyRootFilesystem: true

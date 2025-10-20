@@ -1,0 +1,29 @@
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingWebhookConfiguration
+metadata:
+  name: image-validator
+  labels:
+    app: image-validator
+webhooks:
+  - name: image-validator.image-validator-demo.svc
+    clientConfig:
+      service:
+        name: image-validator
+        namespace: image-validator-demo
+        path: "/validate"
+        port: 8443
+      caBundle: CA_BUNDLE_PLACEHOLDER
+    rules:
+      - apiGroups: [""]
+        apiVersions: ["v1"]
+        operations: ["CREATE", "UPDATE"]
+        resources: ["pods"]
+    failurePolicy: Fail
+    sideEffects: None
+    admissionReviewVersions: ["v1"]
+    timeoutSeconds: 10
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: NotIn
+          values: [image-validator-demo, kube-system]
