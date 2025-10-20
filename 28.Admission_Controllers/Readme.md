@@ -119,6 +119,8 @@ WORKDIR /app
 COPY validate-pod.py /app/
 COPY tls/ /certs/
 
+RUN chmod 644 /certs/tls.crt /certs/tls.key
+
 RUN pip install flask
 
 EXPOSE 8443
@@ -705,6 +707,7 @@ This webhook:
 * You can extend it for other policies like **image repo restrictions**, **resource limits**, or **required labels**.
 
 ---
+
 
 
 
