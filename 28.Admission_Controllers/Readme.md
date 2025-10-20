@@ -634,6 +634,7 @@ kubectl apply -f validating-webhook-final.yaml
 kubectl apply -f test-pods/bad-pod.yaml    # Should fail
 kubectl apply -f test-pods/good-pod.yaml   # Should succeed
 ```
+<img width="1147" height="249" alt="image" src="https://github.com/user-attachments/assets/3892580e-0bf6-4bed-b4aa-5565ba613e73" />
 
 ---
 
@@ -707,6 +708,7 @@ This webhook:
 * You can extend it for other policies like **image repo restrictions**, **resource limits**, or **required labels**.
 
 ---
+
 
 
 
