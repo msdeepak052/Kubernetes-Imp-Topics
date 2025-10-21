@@ -1,0 +1,119 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  namespace: opa
+  name: opa-policies
+  labels:
+    app: opa
+data:
+  main.rego: |
+    package system
+
+    main = {
+      "apiVersion": "admission.k8s.io/v1",
+      "kind": "AdmissionReview",
+      "response": response,
+    }
+
+    default response = {"allowed": true}
+
+    response = {
+      "uid": input.request.uid,
+      "allowed": false,
+      "status": {
+        "reason": reason,
+      },
+    } {
+      count(denial_reasons) > 0
+      reason = concat(", ", denial_reasons)
+    }
+
+    denial_reasons = reasons {
+      reasons := [r | r := data.kubernetes.admission.deny[_]]
+    }
+    
+  kubernetes.rego: |
+    package kubernetes.admission
+
+    # Collect all policy violations
+    deny[reason] {
+      r := data.policies.deny[_]
+      reason := r
+    }
+
+    # Check pod security - must run as non-root
+    deny[reason] {
+      input.request.kind.kind == "Pod"
+      not input_check_pod_security
+      reason := "Pod security policy violation: must run as non-root user with UID > 10000"
+    }
+
+    # Check resource limits - must have CPU and memory limits
+    deny[reason] {
+      input.request.kind.kind == "Pod"
+      not input_check_resource_limits
+      reason := "Resource limits violation: CPU and memory limits are required for all containers"
+    }
+
+    # Helper: Check pod security context
+    input_check_pod_security {
+      spec := input.request.object.spec
+      spec.securityContext.runAsNonRoot == true
+      spec.securityContext.runAsUser > 10000
+    }
+
+    # Helper: Check resource limits exist
+    input_check_resource_limits {
+      spec := input.request.object.spec
+      container := spec.containers[_]
+      container.resources.limits
+      container.resources.limits.cpu
+      container.resources.limits.memory
+    }
+    
+  policies.rego: |
+    package policies
+
+    # Policy 1: Deny privileged containers
+    deny["Privileged containers are not allowed"] {
+      input.request.kind.kind == "Pod"
+      container := input.request.object.spec.containers[_]
+      container.securityContext.privileged == true
+    }
+
+    # Policy 2: Deny latest image tags for Pods
+    deny["Latest image tags are not allowed for Pods"] {
+      input.request.kind.kind == "Pod"
+      container := input.request.object.spec.containers[_]
+      endswith(container.image, ":latest")
+    }
+
+    # Policy 3: Deny latest image tags for Deployments
+    deny["Latest image tags are not allowed for Deployments"] {
+      input.request.kind.kind == "Deployment"
+      container := input.request.object.spec.containers[_]
+      endswith(container.image, ":latest")
+    }
+
+    # Policy 4: Deny root user
+    deny["Running as root user (runAsUser: 0) is not allowed"] {
+      input.request.kind.kind == "Pod"
+      input.request.object.spec.securityContext.runAsUser == 0
+    }
+
+    # Policy 5: Deny host network sharing
+    deny["Host network sharing is not allowed"] {
+      input.request.kind.kind == "Pod"
+      input.request.object.spec.hostNetwork == true
+    }
+
+    # Policy 6: Deny host PID sharing
+    deny["Host PID sharing is not allowed"] {
+      input.request.kind.kind == "Pod"
+      input.request.object.spec.hostPID == true
+    }
+
+    # Bypass for cluster admins
+    bypass_policies {
+      input.request.userInfo.groups[_] == "system:masters"
+    }

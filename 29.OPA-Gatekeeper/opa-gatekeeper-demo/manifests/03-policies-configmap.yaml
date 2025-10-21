@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  namespace: opa
+  name: opa-policies
+data:
+  main.rego: |
+    package system
+
+    # Handle Kubernetes native AdmissionReview format
+    main = {
+      "apiVersion": "admission.k8s.io/v1",
+      "kind": "AdmissionReview",
+      "response": response
+    }
+
+    # Default response - allow everything
+    default response = {"allowed": true}
+
+    # Response when we want to deny
+    response = {
+      "uid": input.request.uid,
+      "allowed": false,
+      "status": {"message": "Pod creation denied by OPA policy"}
+    } {
+      # Simple deny rule for testing
+      input.request.kind.kind == "Pod"
+      input.request.object.metadata.name == "test-pod-denied"
+    }
