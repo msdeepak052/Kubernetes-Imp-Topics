@@ -30,7 +30,7 @@ kubectl create -f https://github.com/operator-framework/operator-lifecycle-manag
 
 or
 
-curl -sL https://github.com/operator-framework/operator-lifecycle-manager/releases/download/v0.35.0/install.sh | bash -s v0.32.0
+curl -sL https://github.com/operator-framework/operator-lifecycle-manager/releases/download/v0.35.0/install.sh | bash -s v0.35.0
 
 ```
 
