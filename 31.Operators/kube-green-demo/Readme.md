@@ -30,7 +30,7 @@ kubectl create -f https://github.com/operator-framework/operator-lifecycle-manag
 
 or
 
-curl -sL https://github.com/operator-framework/operator-lifecycle-manager/releases/download/v0.35.0/install.sh | bash -s v0.35.0
+curl -sL https://github.com/operator-framework/operator-lifecycle-manager/releases/download/v0.32.0/install.sh | bash -s v0.32.0
 
 ```
 
@@ -43,8 +43,26 @@ kubectl get pods -n olm
 You should see pods like `olm-operator`, `catalog-operator`, etc.
 
 ---
+## **Step 3: Deploy cert-manager**
+1. Install cert-manager
+```bash
+kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.19.1/cert-manager.yaml
+```
 
-## **Step 3: Deploy kube-green Operator**
+2. Verify
+
+```bash
+
+$ kubectl get pods -n cert-manager
+
+NAME                                       READY   STATUS    RESTARTS   AGE
+cert-manager-5c6866597-zw7kh               1/1     Running   0          2m
+cert-manager-cainjector-577f6d9fd7-tr77l   1/1     Running   0          2m
+cert-manager-webhook-787858fcdb-nlzsq      1/1     Running   0          2m
+
+```
+
+## **Step 4: Deploy kube-green Operator**
 
 1. Create a namespace for operators:
 
