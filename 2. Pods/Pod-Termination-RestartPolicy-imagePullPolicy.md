@@ -151,9 +151,6 @@ spec:
 <img width="1371" height="702" alt="image" src="https://github.com/user-attachments/assets/678efc67-d421-495b-80a0-78660bdc179b" />
 
 ---
-Excellent question, Deepak 👏 — understanding **`imagePullPolicy`** is crucial for controlling how Kubernetes pulls container images from registries. Let’s go step by step.
-
----
 
 # 🧠 What is `imagePullPolicy`?
 
