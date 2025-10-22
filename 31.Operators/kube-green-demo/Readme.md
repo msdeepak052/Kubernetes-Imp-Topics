@@ -34,11 +34,17 @@ curl -sL https://github.com/operator-framework/operator-lifecycle-manager/releas
 
 ```
 
+<img width="1143" height="690" alt="image" src="https://github.com/user-attachments/assets/5ff93577-06cc-4dba-baf4-89eadcb1bf67" />
+
+
 Verify OLM pods:
 
 ```bash
 kubectl get pods -n olm
 ```
+
+<img width="789" height="108" alt="image" src="https://github.com/user-attachments/assets/165f7407-6dcb-4b81-a96e-36f653ea4781" />
+
 
 You should see pods like `olm-operator`, `catalog-operator`, etc.
 
@@ -48,6 +54,9 @@ You should see pods like `olm-operator`, `catalog-operator`, etc.
 ```bash
 kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.19.1/cert-manager.yaml
 ```
+
+<img width="1014" height="415" alt="image" src="https://github.com/user-attachments/assets/b1aa550c-7244-499b-b108-8306dfc84121" />
+
 
 2. Verify
 
@@ -61,6 +70,9 @@ cert-manager-cainjector-577f6d9fd7-tr77l   1/1     Running   0          2m
 cert-manager-webhook-787858fcdb-nlzsq      1/1     Running   0          2m
 
 ```
+
+<img width="775" height="178" alt="image" src="https://github.com/user-attachments/assets/a064edc8-caf3-437f-8663-5f2b1562ec8b" />
+
 
 ## **Step 4: Deploy kube-green Operator**
 
