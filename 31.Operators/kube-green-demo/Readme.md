@@ -64,22 +64,20 @@ cert-manager-webhook-787858fcdb-nlzsq      1/1     Running   0          2m
 
 ## **Step 4: Deploy kube-green Operator**
 
-1. Create a namespace for operators:
+1. Deploy kube-green Operator using its official manifest:
 
 ```bash
-kubectl create namespace operators
+kubectl create -f https://operatorhub.io/install/kube-green.yaml
 ```
 
-2. Deploy kube-green Operator using its official manifest:
+Verify:
 
 ```bash
-kubectl apply -f https://raw.githubusercontent.com/liqotech/kube-green/main/deploy/operator.yaml -n operators
-```
+kubectl get operators
 
-Check the operator pod:
+$ kubectl get csv
 
-```bash
-kubectl get pods -n operators
+kubectl api-resources --api-group='kube-green.com' -o wide
 ```
 
 You should see something like:
@@ -106,7 +104,7 @@ metadata:
   labels:
     app: nginx
 spec:
-  replicas: 2
+  replicas: 3
   selector:
     matchLabels:
       app: nginx
