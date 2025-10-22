@@ -25,8 +25,8 @@ OLM is used to install and manage Operators on Kubernetes.
 
 ```bash
 # Apply the OLM manifests (v0.25.0 as example)
-kubectl apply -f https://github.com/operator-framework/operator-lifecycle-manager/releases/download/v0.25.0/crds.yaml
-kubectl apply -f https://github.com/operator-framework/operator-lifecycle-manager/releases/download/v0.25.0/olm.yaml
+kubectl create -f https://github.com/operator-framework/operator-lifecycle-manager/releases/latest/download/crds.yaml
+kubectl create -f https://github.com/operator-framework/operator-lifecycle-manager/releases/latest/download/olm.yaml
 ```
 
 Verify OLM pods:
