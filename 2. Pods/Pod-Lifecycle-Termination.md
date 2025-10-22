@@ -74,5 +74,81 @@ here’s exactly what happens, step by step:
 
 <img width="1884" height="476" alt="image" src="https://github.com/user-attachments/assets/95e26c3b-73fa-48f6-bf77-b70f7fefd592" />
 
+---
 
-If you want, I can also **draw a simple diagram showing the Pod deletion lifecycle**, which makes it very easy to visualize. Do you want me to do that?
+# Restart Policy
+
+In Kubernetes, the **Restart Policy** defines **how containers in a Pod should be restarted** when they exit. This is a **Pod-level setting**, not per container. Let’s break it down clearly:
+
+---
+
+## 1. **Where It’s Defined**
+
+The restart policy is specified in the Pod spec:
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: example-pod
+spec:
+  restartPolicy: <Policy>
+  containers:
+    - name: nginx
+      image: nginx
+```
+
+---
+
+## 2. **Possible Values**
+
+### a) **Always** (Default for Deployments)
+
+* **Behavior:** The container is restarted **every time it exits**, regardless of exit status.
+* **Use case:** Long-running services (e.g., web servers, databases).
+* **Example:**
+  If Nginx crashes, Kubernetes will immediately restart it.
+
+---
+
+### b) **OnFailure**
+
+* **Behavior:** The container is restarted **only if it exits with a non-zero status** (failure).
+* **Use case:** Batch jobs or tasks that might fail and need retrying.
+* **Example:**
+  A script that processes files; if it fails, Kubernetes restarts it.
+
+---
+
+### c) **Never**
+
+* **Behavior:** The container is **never restarted**, regardless of exit status.
+* **Use case:** Run-once jobs where failure should not trigger retries.
+* **Example:**
+  A Pod that runs a database migration script once and then exits.
+
+---
+
+## 3. **Important Notes**
+
+* **Deployments / ReplicaSets** always effectively have `restartPolicy: Always`, because they manage Pods and try to keep them running.
+* **Jobs / CronJobs** usually use `restartPolicy: OnFailure` or `Never`.
+* **RestartPolicy only applies to containers inside a Pod**, not Pods themselves.
+* Changing a Pod’s restart policy **after creation is not allowed**. You must create a new Pod spec.
+
+---
+
+### 4. **Visual Summary**
+
+| Restart Policy | Container Exit | Restarted? | Typical Use Case            |
+| -------------- | -------------- | ---------- | --------------------------- |
+| Always         | 0 or >0        | Yes        | Long-running services       |
+| OnFailure      | 0              | No         | Batch jobs (success → stop) |
+| OnFailure      | >0             | Yes        | Retry on failure            |
+| Never          | 0 or >0        | No         | Run-once jobs or scripts    |
+
+
+<img width="1371" height="702" alt="image" src="https://github.com/user-attachments/assets/678efc67-d421-495b-80a0-78660bdc179b" />
+
+---
+
