@@ -57,6 +57,12 @@
    - Monitoring and alerting
    - Performance optimization
 
+---
+<img width="1540" height="644" alt="image" src="https://github.com/user-attachments/assets/89e4dbd2-622f-4dc6-8ea8-93b9420639eb" />
+
+
+---
+
 ## Demo: Creating a Simple MySQL Operator
 
 Let's create a basic MySQL operator that manages MySQL instances with automated backups.
@@ -865,3 +871,4 @@ kubectl get pods -w
 6. **Finalizers**: Handle resource cleanup properly
 
 This operator demonstrates how complex operational knowledge (backup strategies, safe scaling, version upgrades) can be encoded into software, making it easier to manage stateful applications in Kubernetes.
+
