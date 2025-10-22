@@ -24,9 +24,14 @@ kubectl get nodes
 OLM is used to install and manage Operators on Kubernetes.
 
 ```bash
-# Apply the OLM manifests (v0.25.0 as example)
+# Apply the OLM manifests 
 kubectl create -f https://github.com/operator-framework/operator-lifecycle-manager/releases/latest/download/crds.yaml
 kubectl create -f https://github.com/operator-framework/operator-lifecycle-manager/releases/latest/download/olm.yaml
+
+or
+
+curl -sL https://github.com/operator-framework/operator-lifecycle-manager/releases/download/v0.35.0/install.sh | bash -s v0.32.0
+
 ```
 
 Verify OLM pods:
