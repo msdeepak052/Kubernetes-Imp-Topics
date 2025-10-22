@@ -43,8 +43,7 @@ Verify OLM pods:
 kubectl get pods -n olm
 ```
 
-<img width="789" height="108" alt="image" src="https://github.com/user-attachments/assets/165f7407-6dcb-4b81-a96e-36f653ea4781" />
-
+<img width="605" height="192" alt="image" src="https://github.com/user-attachments/assets/2c3da6fe-f6d5-4c7e-bdd9-ba3db5bc1411" />
 
 You should see pods like `olm-operator`, `catalog-operator`, etc.
 
@@ -71,7 +70,7 @@ cert-manager-webhook-787858fcdb-nlzsq      1/1     Running   0          2m
 
 ```
 
-<img width="775" height="178" alt="image" src="https://github.com/user-attachments/assets/a064edc8-caf3-437f-8663-5f2b1562ec8b" />
+<img width="718" height="185" alt="image" src="https://github.com/user-attachments/assets/907ae965-3105-4ce1-9071-64d8f30cad14" />
 
 
 ## **Step 4: Deploy kube-green Operator**
@@ -87,10 +86,16 @@ Verify:
 ```bash
 kubectl get operators
 
-$ kubectl get csv
+kubectl get csv
 
 kubectl api-resources --api-group='kube-green.com' -o wide
 ```
+
+<img width="349" height="95" alt="image" src="https://github.com/user-attachments/assets/fe97a4c8-2cf9-4b42-97a7-7cd82320897b" />
+
+<img width="570" height="78" alt="image" src="https://github.com/user-attachments/assets/76eb627d-619e-46fb-808c-d266aea895e3" />
+
+<img width="1074" height="85" alt="image" src="https://github.com/user-attachments/assets/831d47b7-400a-4c37-94d2-9d2b3d9258b3" />
 
 You should see something like:
 
@@ -153,22 +158,23 @@ kube-green uses the **SleepInfo CRD** to decide when to scale down/up workloads.
 Create `sleepinfo.yaml`:
 
 ```yaml
-apiVersion: kube-green.liqo.io/v1alpha1
+# sleepinfo.yaml
+apiVersion: kube-green.com/v1alpha1
 kind: SleepInfo
 metadata:
-  name: nginx-sleep
-  namespace: default
+  labels:
+    app: kube-green
+  name: sleepinfo-sample
 spec:
-  selector:
-    matchLabels:
-      app: nginx
-  schedule:
-    - day: Mon-Fri
-      startTime: "20:00"
-      endTime: "08:00"
-  behavior:
-    scaleDownReplicas: 0
-    scaleUpReplicas: 2
+  excludeRef:
+    - apiVersion: apps/v1
+      kind: Deployment
+      name: critical-app
+  sleepAt: '17:55'
+  wakeUpAt: '08:00'
+  weekdays: 0-6
+  suspendCronJobs: true
+  timeZone: Asia/Kolkata
 ```
 
 Apply it:
@@ -176,6 +182,7 @@ Apply it:
 ```bash
 kubectl apply -f sleepinfo.yaml
 ```
+<img width="620" height="178" alt="image" src="https://github.com/user-attachments/assets/4d8db562-d641-4977-aa6b-7f8d5d50d536" />
 
 ---
 
