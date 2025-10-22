@@ -280,3 +280,68 @@ This secret stores Docker registry credentials.
 
 ---
 
+## 🧩 Scenario
+
+You define your container like this:
+
+```yaml
+containers:
+  - name: web
+    image: myrepo/myapp:latest
+    imagePullPolicy: IfNotPresent
+```
+
+---
+
+## ⚙️ What Happens Internally
+
+* You explicitly tell Kubernetes:
+
+  * **Image tag:** `latest`
+  * **imagePullPolicy:** `IfNotPresent`
+
+So Kubernetes will **respect your explicit configuration** — the `imagePullPolicy` you set **overrides the default behavior**.
+
+Normally, using `:latest` automatically sets the policy to `Always` (by default),
+but if you explicitly specify `IfNotPresent`, **that default is ignored**.
+
+---
+
+## 🧠 So in this case:
+
+* The kubelet will **check if `myrepo/myapp:latest` exists on the node**.
+* If the image **is already cached**, Kubernetes **will not pull it again**.
+* If the image **doesn’t exist locally**, it will **pull it once** from the registry and then reuse it for subsequent Pods.
+
+---
+
+## 🚨 Risk and Recommendation
+
+Even though it *works*, it’s **not recommended** in production or CI/CD environments because:
+
+* The `latest` tag is **mutable** — it can point to different image versions over time.
+* If you use `IfNotPresent`, you might **accidentally run an outdated image** that’s already cached on the node.
+* You lose control over which version is actually deployed.
+
+---
+
+## ✅ Best Practice
+
+| Use Case                            | Recommended Approach                                           |
+| ----------------------------------- | -------------------------------------------------------------- |
+| Dev / testing (want newest image)   | `image: myrepo/myapp:latest` + `imagePullPolicy: Always`       |
+| Stable production release           | `image: myrepo/myapp:v1.0.0` + `imagePullPolicy: IfNotPresent` |
+| Air-gapped / preloaded environments | `imagePullPolicy: Never`                                       |
+
+---
+
+### 🔍 Summary
+
+| Condition                                     | Result                                                |
+| --------------------------------------------- | ----------------------------------------------------- |
+| Image tag = `latest`, no policy set           | Defaults to `Always`                                  |
+| Image tag = `latest`, policy = `IfNotPresent` | Policy respected — only pulls if not cached           |
+| Risk                                          | May use stale image if node has an old cached version |
+
+---
+
