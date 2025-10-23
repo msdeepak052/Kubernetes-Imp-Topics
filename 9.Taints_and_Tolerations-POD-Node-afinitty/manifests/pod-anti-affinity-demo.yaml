@@ -1,0 +1,39 @@
+# pod-anti-affinity-demo.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ha-web-app
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: ha-web
+  template:
+    metadata:
+      labels:
+        app: ha-web
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - ha-web
+              topologyKey: kubernetes.io/hostname
+          - weight: 50
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - ha-web
+              topologyKey: topology.kubernetes.io/zone
+      containers:
+      - name: web
+        image: nginx

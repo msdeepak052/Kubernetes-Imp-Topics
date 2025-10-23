@@ -413,6 +413,154 @@ spec:
         image: nginx
 ```
 
+---
+Perfect, Deepak — now we are talking about **Pod Anti-Affinity**! Let’s break this YAML **line by line** and explain how Kubernetes uses it to schedule pods.
+
+---
+
+## 🔹 Concept: Pod Anti-Affinity
+
+**Pod Anti-Affinity** ensures that a pod **prefers (or requires)** **not** to be scheduled on the same node (or topology domain) as other pods matching certain labels.
+
+* **Affinity** → “I want to be close to these pods”
+* **Anti-Affinity** → “I want to avoid these pods”
+
+This is useful for **high availability**, **spreading replicas**, or avoiding a single-node failure.
+
+---
+
+## 🔹 Your YAML Explained
+
+```yaml
+spec:
+  affinity:
+    podAntiAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 100
+        podAffinityTerm:
+          labelSelector:
+            matchExpressions:
+            - key: app
+              operator: In
+              values:
+              - ha-web
+          topologyKey: kubernetes.io/hostname
+      - weight: 50
+        podAffinityTerm:
+          labelSelector:
+            matchExpressions:
+            - key: app
+              operator: In
+              values:
+              - ha-web
+          topologyKey: topology.kubernetes.io/zone
+```
+
+---
+
+### 1️⃣ `preferredDuringSchedulingIgnoredDuringExecution`
+
+* **Soft rule** → scheduler **prefers** to satisfy it but can ignore it if necessary.
+* Unlike `requiredDuringSchedulingIgnoredDuringExecution` which is **mandatory**, soft rules only **influence scoring**.
+
+---
+
+### 2️⃣ `weight: 100` & `weight: 50`
+
+* **Weight** determines the **priority of this anti-affinity rule** when choosing a node.
+* Higher weight → scheduler **strongly prefers to avoid** violating this rule.
+* Lower weight → less strict, softer preference.
+
+In your case:
+
+* `weight: 100` → avoid other `ha-web` pods **on the same node** (hostname level)
+* `weight: 50` → avoid other `ha-web` pods **in the same zone** (topology spread level)
+
+---
+
+### 3️⃣ `podAffinityTerm`
+
+This defines **which pods to avoid** and **where**:
+
+#### a) `labelSelector`
+
+```yaml
+labelSelector:
+  matchExpressions:
+  - key: app
+    operator: In
+    values:
+    - ha-web
+```
+
+* Scheduler looks for pods with label `app=ha-web`.
+* The anti-affinity rule applies only to these pods.
+
+#### b) `topologyKey`
+
+```yaml
+topologyKey: kubernetes.io/hostname
+```
+
+* The **domain to consider**.
+* `kubernetes.io/hostname` → node level → avoid scheduling on the **same node** as matching pods.
+* `topology.kubernetes.io/zone` → zone level → avoid scheduling in the **same zone** as matching pods (multi-AZ clusters).
+
+---
+
+### 4️⃣ How Scheduler Uses This
+
+1. Scheduler finds **eligible nodes** based on **other constraints** (resources, taints, node affinity, etc.)
+2. For each eligible node, scheduler **calculates a score**:
+
+   * If a node **violates anti-affinity** (e.g., already has a pod `ha-web` on the same node), the score is **reduced based on weight**.
+   * Nodes that satisfy the anti-affinity rule get **higher scores**.
+3. Pod is scheduled on the node with the **highest total score**.
+
+---
+
+### 🔹 Example Scenario
+
+Suppose you have 3 nodes:
+
+| Node  | Pods running | Zone   |
+| ----- | ------------ | ------ |
+| node1 | ha-web-1     | zone-a |
+| node2 | none         | zone-a |
+| node3 | ha-web-2     | zone-b |
+
+**Scheduling a new `ha-web` pod**:
+
+* **Weight 100, hostname anti-affinity**: scheduler avoids node1 & node3 **because both have `ha-web` on the same node** → only node2 is preferred.
+* **Weight 50, zone anti-affinity**: if node2 is in zone-a (same as node1), it slightly reduces score but still preferable.
+
+✅ Result: Pod is scheduled on **node2** — spreads pods across nodes and zones, achieving high availability.
+
+---
+
+### 🔹 Key Points
+
+| Field                                             | Notes                                                       |
+| ------------------------------------------------- | ----------------------------------------------------------- |
+| `podAntiAffinity`                                 | Avoid pods matching a label on same node/zone/etc.          |
+| `preferredDuringSchedulingIgnoredDuringExecution` | Soft rule → scheduler may ignore if necessary               |
+| `weight`                                          | Determines importance of the soft rule (1-100)              |
+| `topologyKey`                                     | Level to apply the anti-affinity (node, zone, region, etc.) |
+| `labelSelector`                                   | Defines which pods to consider for anti-affinity            |
+
+---
+
+💡 **Tip for CKA:**
+
+* Use **hostname** for node-level HA.
+* Use **zone** for multi-AZ HA.
+* Use **weights** to prioritize one rule over another.
+* Anti-affinity does **not prevent scheduling entirely** unless `requiredDuringSchedulingIgnoredDuringExecution` is used.
+
+---
+
+
+
 ### Step 5: Pod Affinity for Co-location
 ```yaml
 # pod-affinity-demo.yaml
