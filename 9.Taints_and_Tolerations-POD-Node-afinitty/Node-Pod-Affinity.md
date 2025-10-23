@@ -583,6 +583,9 @@ spec:
       containers:
       - name: db
         image: postgres:13
+        env:
+        - name: POSTGRES_PASSWORD
+          value: mysecretpassword
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -626,6 +629,9 @@ spec:
         image: redis:6
 ```
 
+<img width="1197" height="182" alt="image" src="https://github.com/user-attachments/assets/ff936b07-0812-490e-bc95-c51b456230f9" />
+
+
 ### Step 6: Deploy and Verify
 ```bash
 # Apply all manifests
@@ -667,6 +673,7 @@ kubectl get pods -l tier=backend -o wide
 6. **Use weights** to prioritize multiple preferences
 
 This comprehensive guide should give you solid understanding of Kubernetes scheduling constraints for your CKA exam preparation!
+
 
 
 
