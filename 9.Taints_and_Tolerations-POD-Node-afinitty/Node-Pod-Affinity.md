@@ -196,6 +196,9 @@ kubectl label nodes minikube-m03 disktype=ssd environment=development zone=zone-
 
 # Verify labels
 kubectl get nodes --show-labels
+
+<img width="1898" height="269" alt="image" src="https://github.com/user-attachments/assets/9e9f8c42-5c83-4fab-8bcb-31db21f51843" />
+
 ```
 
 ### Step 2: Node Selector Demo
@@ -212,6 +215,8 @@ spec:
   nodeSelector:
     disktype: ssd
 ```
+<img width="1085" height="152" alt="image" src="https://github.com/user-attachments/assets/e42035c6-f31c-4094-a51b-21433db580bf" />
+
 ---
 
 ## 🎯 Scenario:
@@ -517,5 +522,6 @@ kubectl get pods -l tier=backend -o wide
 6. **Use weights** to prioritize multiple preferences
 
 This comprehensive guide should give you solid understanding of Kubernetes scheduling constraints for your CKA exam preparation!
+
 
 
