@@ -321,11 +321,6 @@ If they ask —
 
 ---
 
-
-
-
----
-
 ### Step 3: Node Affinity Demo
 ```yaml
 # node-affinity-demo.yaml
@@ -372,6 +367,8 @@ spec:
       - name: nginx
         image: nginx
 ```
+
+<img width="1253" height="150" alt="image" src="https://github.com/user-attachments/assets/722883ad-fb9d-4cb4-b9d9-9164aa514cf2" />
 
 ### Step 4: Pod Anti-Affinity for High Availability
 ```yaml
@@ -522,6 +519,7 @@ kubectl get pods -l tier=backend -o wide
 6. **Use weights** to prioritize multiple preferences
 
 This comprehensive guide should give you solid understanding of Kubernetes scheduling constraints for your CKA exam preparation!
+
 
 
 
