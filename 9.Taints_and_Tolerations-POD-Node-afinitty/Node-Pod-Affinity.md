@@ -212,6 +212,114 @@ spec:
   nodeSelector:
     disktype: ssd
 ```
+---
+
+## 🎯 Scenario:
+
+You have multiple nodes with the **same label**, e.g.:
+
+```bash
+kubectl label node node1 disktype=ssd
+kubectl label node node2 disktype=ssd
+kubectl label node node3 disktype=ssd
+```
+
+And your pod uses a `nodeSelector` like:
+
+```yaml
+nodeSelector:
+  disktype: ssd
+```
+
+---
+
+## 🧠 What Happens:
+
+When **multiple nodes match** the `nodeSelector` condition —
+→ the **Kubernetes Scheduler** still has to choose **one node** to place the Pod.
+
+Since `nodeSelector` only *filters eligible nodes*, the final choice depends on **Kubernetes scheduler’s internal scoring mechanism** (known as **Scheduling Policies**).
+
+---
+
+## ⚙️ Scheduler Decision Steps (Simplified)
+
+### **Step 1: Filtering**
+
+* Scheduler filters nodes that meet **all constraints**, like:
+
+  * `nodeSelector` match ✅
+  * Sufficient CPU/memory ✅
+  * No taint mismatch ✅
+
+👉 Suppose all 3 nodes (node1, node2, node3) pass filtering.
+
+---
+
+### **Step 2: Scoring**
+
+* Scheduler assigns a **score (0–100)** to each eligible node.
+* It uses various **built-in scoring plugins**, like:
+
+  * `LeastRequestedPriority`: prefer nodes with more free resources.
+  * `BalancedAllocation`: prefer balanced CPU/memory usage.
+  * `ImageLocality`: prefer nodes already having the image.
+  * `TopologySpreadConstraints`: for spreading pods.
+
+👉 The scheduler picks the node with the **highest total score**.
+
+If multiple nodes have the same score → it chooses **randomly** among them.
+
+---
+
+### 🧩 Example (Illustration)
+
+| Node  | Label Match | Free CPU | Image Present | Final Score |
+| ----- | ----------- | -------- | ------------- | ----------- |
+| node1 | ✅           | 40%      | ✅             | 80          |
+| node2 | ✅           | 60%      | ❌             | 70          |
+| node3 | ✅           | 30%      | ✅             | 60          |
+
+➡️ Pod will be scheduled on **node1** because it has the **highest total score** after internal calculations.
+
+---
+
+## 🧾 Summary:
+
+| Step          | Description                                                               |
+| ------------- | ------------------------------------------------------------------------- |
+| 1️⃣ Filtering | Removes ineligible nodes (based on nodeSelector, taints, resources, etc.) |
+| 2️⃣ Scoring   | Assigns preference scores to the remaining nodes                          |
+| 3️⃣ Binding   | Schedules Pod on the **highest-scored** node (or random if tied)          |
+
+---
+
+### ⚠️ Important:
+
+* You **cannot control** which node among matching labels the pod goes to using `nodeSelector` alone.
+* To influence it, you’d use:
+
+  * **Node Affinity** with weights, or
+  * **Pod Topology Spread Constraints** (for even distribution).
+
+---
+
+### 🧩 Tip for CKA Exam:
+
+If they ask —
+
+> “What happens when multiple nodes satisfy a `nodeSelector` condition?”
+
+✅ Answer:
+
+> The scheduler filters all nodes that match the selector, scores them based on available resources and internal policies, and then places the Pod on the node with the highest score (or randomly if equal).
+
+---
+
+
+
+
+---
 
 ### Step 3: Node Affinity Demo
 ```yaml
@@ -409,4 +517,5 @@ kubectl get pods -l tier=backend -o wide
 6. **Use weights** to prioritize multiple preferences
 
 This comprehensive guide should give you solid understanding of Kubernetes scheduling constraints for your CKA exam preparation!
+
 
