@@ -64,6 +64,9 @@ spec:
   backoffLimit: 4
 ```
 
+<img width="814" height="450" alt="image" src="https://github.com/user-attachments/assets/a082d3f2-c565-4b09-b70b-57e0e94fcbef" />
+
+
 ### Parallel Job Example
 ```yaml
 # parallel-job.yaml
