@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "bookstore.fullname" . }}-cache
+spec:
+  replicas: {{ .Values.cache.replicas }}
+  selector:
+    matchLabels:
+      app: {{ include "bookstore.name" . }}-cache
+  template:
+    metadata:
+      labels:
+        app: {{ include "bookstore.name" . }}-cache
+    spec:
+      containers:
+        - name: redis
+          image: {{ .Values.cache.image }}
+          ports:
+            - containerPort: {{ .Values.cache.service.port }}

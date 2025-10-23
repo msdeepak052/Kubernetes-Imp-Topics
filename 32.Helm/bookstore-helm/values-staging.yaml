@@ -1,0 +1,40 @@
+global:
+  appName: bookstore
+  namespace: bookstore-staging
+
+frontend:
+  image: "nginx:latest"
+  replicas: 2
+  service:
+    type: ClusterIP
+    port: 80
+
+backend:
+  image: "ghcr.io/example/bookstore-backend:staging"
+  replicas: 2
+  service:
+    type: ClusterIP
+    port: 8080
+  env:
+    DB_HOST: "{{ include \"bookstore.fullname\" . }}-db"
+    REDIS_HOST: "{{ include \"bookstore.fullname\" . }}-cache"
+  secretKey: "staging-secret-key"
+
+database:
+  image: "mysql:8"
+  replicas: 1
+  service:
+    port: 3306
+  mysqlRootPassword: "Staging@Root123"
+  mysqlDatabase: "bookstore_staging"
+
+cache:
+  image: "redis:7"
+  replicas: 1
+  service:
+    port: 6379
+
+ingress:
+  enabled: true
+  className: nginx
+  host: staging.bookstore.example.com

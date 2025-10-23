@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "bookstore.fullname" . }}-backend
+spec:
+  replicas: {{ .Values.backend.replicas }}
+  selector:
+    matchLabels:
+      app: {{ include "bookstore.name" . }}-backend
+  template:
+    metadata:
+      labels:
+        app: {{ include "bookstore.name" . }}-backend
+    spec:
+      containers:
+        - name: backend
+          image: {{ .Values.backend.image }}
+          env:
+            - name: DB_HOST
+              value: {{ .Values.backend.env.DB_HOST | quote }}
+            - name: REDIS_HOST
+              value: {{ .Values.backend.env.REDIS_HOST | quote }}
+            - name: BACKEND_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "bookstore.fullname" . }}-secrets
+                  key: BACKEND_SECRET_KEY
+          ports:
+            - containerPort: {{ .Values.backend.service.port }}

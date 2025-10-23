@@ -1,0 +1,6 @@
+apiVersion: v2
+name: bookstore-helm
+description: A multi-tier Bookstore application Helm chart
+type: application
+version: 1.0.0
+appVersion: "1.0"

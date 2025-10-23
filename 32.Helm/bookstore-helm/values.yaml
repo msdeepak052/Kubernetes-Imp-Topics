@@ -1,0 +1,39 @@
+global:
+  appName: bookstore
+  namespace: bookstore
+
+frontend:
+  image: "nginx:latest"
+  replicas: 1
+  service:
+    type: ClusterIP
+    port: 80
+
+backend:
+  image: "ghcr.io/example/bookstore-backend:latest"
+  replicas: 1
+  service:
+    type: ClusterIP
+    port: 8080
+  env:
+    DB_HOST: "bookstore-db"
+    REDIS_HOST: "bookstore-cache"
+
+database:
+  image: "mysql:8"
+  replicas: 1
+  service:
+    port: 3306
+  mysqlRootPassword: "root123"
+  mysqlDatabase: "bookstore"
+
+cache:
+  image: "redis:7"
+  replicas: 1
+  service:
+    port: 6379
+
+ingress:
+  enabled: true
+  className: nginx
+  host: bookstore.devops.local

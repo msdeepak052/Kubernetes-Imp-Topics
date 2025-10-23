@@ -1,0 +1,41 @@
+global:
+  appName: bookstore
+  namespace: bookstore
+
+frontend:
+  image: "nginx:stable"
+  replicas: 3
+  service:
+    type: ClusterIP
+    port: 80
+
+backend:
+  image: "ghcr.io/example/bookstore-backend:1.0.0"
+  replicas: 3
+  service:
+    type: ClusterIP
+    port: 8080
+  env:
+    DB_HOST: "{{ include \"bookstore.fullname\" . }}-db"
+    REDIS_HOST: "{{ include \"bookstore.fullname\" . }}-cache"
+  # Provide a secure secret in production. This is a placeholder.
+  secretKey: "prod-very-strong-secret-key-CHANGE_ME"
+
+database:
+  image: "mysql:8"
+  replicas: 1
+  service:
+    port: 3306
+  mysqlRootPassword: "Prod@RootPass123!"   # replace with a real secret store value in prod
+  mysqlDatabase: "bookstore_prod"
+
+cache:
+  image: "redis:7"
+  replicas: 2
+  service:
+    port: 6379
+
+ingress:
+  enabled: true
+  className: nginx
+  host: bookstore.example.com

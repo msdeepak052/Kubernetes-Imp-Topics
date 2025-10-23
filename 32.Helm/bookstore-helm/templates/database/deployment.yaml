@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "bookstore.fullname" . }}-db
+spec:
+  replicas: {{ .Values.database.replicas }}
+  selector:
+    matchLabels:
+      app: {{ include "bookstore.name" . }}-db
+  template:
+    metadata:
+      labels:
+        app: {{ include "bookstore.name" . }}-db
+    spec:
+      containers:
+        - name: mysql
+          image: {{ .Values.database.image }}
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "bookstore.fullname" . }}-secrets
+                  key: MYSQL_ROOT_PASSWORD
+            - name: MYSQL_DATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "bookstore.fullname" . }}-secrets
+                  key: MYSQL_DATABASE
+          ports:
+            - containerPort: {{ .Values.database.service.port }}
