@@ -165,50 +165,47 @@ spec:
 ```yaml
 # 3-db-migration-job.yaml
 apiVersion: batch/v1
-kind: Job
+kind: CronJob
 metadata:
-  name: database-migration
-  namespace: job-demo
-  labels:
-    app: migration
-    task: database-update
+  name: mysql-backup
+  namespace: database
 spec:
-  template:
-    metadata:
-      labels:
-        app: migration
-        task: database-update
+  schedule: "0 6 * * *"  # every day at 6 AM
+  jobTemplate:
     spec:
-      containers:
-      - name: migrator
-        image: postgres:13
-        env:
-        - name: POSTGRES_PASSWORD
-          value: "password"
-        - name: PGHOST
-          value: "postgres-service"
-        command: 
-        - /bin/bash
-        - -c
-        - |
-          echo "Starting database migration at $(date)"
-          # Simulate migration steps
-          sleep 30
-          echo "Creating new tables..."
-          sleep 20
-          echo "Migrating data..."
-          sleep 40
-          echo "Database migration completed successfully at $(date)"
-        resources:
-          requests:
-            memory: "256Mi"
-            cpu: "250m"
-          limits:
-            memory: "512Mi"
-            cpu: "500m"
-      restartPolicy: OnFailure
-  backoffLimit: 2
-  activeDeadlineSeconds: 300  # 5 minutes max
+      template:
+        spec:
+          containers:
+          - name: mysql-backup
+            image: mysql:8
+            env:
+            - name: MYSQL_USER
+              value: root
+            - name: MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret
+                  key: password
+            - name: MYSQL_HOST
+              value: mysql.database.svc.cluster.local
+            - name: MYSQL_DB
+              value: myappdb
+            command:
+            - /bin/sh
+            - -c
+            - |
+              echo "Starting backup at $(date)"
+              mysqldump -h $MYSQL_HOST -u $MYSQL_USER -p$MYSQL_PASSWORD $MYSQL_DB > /backup/db-$(date +%F-%H-%M).sql
+              echo "Backup completed successfully at $(date)"
+            volumeMounts:
+            - name: backup-storage
+              mountPath: /backup
+          restartPolicy: OnFailure
+          volumes:
+          - name: backup-storage
+            persistentVolumeClaim:
+              claimName: mysql-backup-pvc
+
 ```
 
 ### Step 5: Multiple CronJobs for Different Schedules
