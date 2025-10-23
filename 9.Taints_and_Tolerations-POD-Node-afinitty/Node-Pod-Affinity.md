@@ -413,8 +413,8 @@ spec:
         image: nginx
 ```
 
----
-Perfect, Deepak — now we are talking about **Pod Anti-Affinity**! Let’s break this YAML **line by line** and explain how Kubernetes uses it to schedule pods.
+<img width="1240" height="154" alt="image" src="https://github.com/user-attachments/assets/424fcfb0-6c46-416c-b195-645d7eda7dab" />
+
 
 ---
 
@@ -667,6 +667,7 @@ kubectl get pods -l tier=backend -o wide
 6. **Use weights** to prioritize multiple preferences
 
 This comprehensive guide should give you solid understanding of Kubernetes scheduling constraints for your CKA exam preparation!
+
 
 
 
