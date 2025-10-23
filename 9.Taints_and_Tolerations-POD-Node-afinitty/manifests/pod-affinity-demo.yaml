@@ -1,0 +1,64 @@
+# pod-affinity-demo.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: database
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: database
+      tier: backend
+  template:
+    metadata:
+      labels:
+        app: database
+        tier: backend
+    spec:
+      containers:
+      - name: db
+        image: postgres:13
+        env:
+        - name: POSTGRES_PASSWORD
+          value: mysecretpassword
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cache
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: cache
+      tier: backend
+  template:
+    metadata:
+      labels:
+        app: cache
+        tier: backend
+    spec:
+      affinity:
+        podAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 80
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - database
+              topologyKey: kubernetes.io/hostname
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: app
+                operator: In
+                values:
+                - cache
+            topologyKey: kubernetes.io/hostname
+      containers:
+      - name: redis
+        image: redis:6
