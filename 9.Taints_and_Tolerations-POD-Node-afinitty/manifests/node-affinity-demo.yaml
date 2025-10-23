@@ -1,0 +1,43 @@
+# node-affinity-demo.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: node-affinity-demo
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: node-affinity-app
+  template:
+    metadata:
+      labels:
+        app: node-affinity-app
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: disktype
+                operator: In
+                values:
+                - ssd
+                - nvme
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 70
+            preference:
+              matchExpressions:
+              - key: environment
+                operator: In
+                values:
+                - production
+          - weight: 30
+            preference:
+              matchExpressions:
+              - key: zone
+                operator: In
+                values:
+                - zone-a
+      containers:
+      - name: nginx
+        image: nginx

@@ -1,0 +1,11 @@
+# node-selector-demo.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: node-selector-pod
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+  nodeSelector:
+    disktype: ssd
