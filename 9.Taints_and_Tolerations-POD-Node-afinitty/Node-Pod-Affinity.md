@@ -190,9 +190,9 @@ Let me create a comprehensive demo covering all concepts:
 ### Step 1: Setup Nodes with Labels
 ```bash
 # Label nodes (assuming 3-node cluster)
-kubectl label nodes node1 disktype=ssd environment=production zone=zone-a
-kubectl label nodes node2 disktype=hdd environment=staging zone=zone-b
-kubectl label nodes node3 disktype=ssd environment=development zone=zone-a
+kubectl label nodes minikube disktype=ssd environment=production zone=zone-a
+kubectl label nodes minikube-m02 disktype=hdd environment=staging zone=zone-b
+kubectl label nodes minikube-m03 disktype=ssd environment=development zone=zone-a
 
 # Verify labels
 kubectl get nodes --show-labels
@@ -409,3 +409,4 @@ kubectl get pods -l tier=backend -o wide
 6. **Use weights** to prioritize multiple preferences
 
 This comprehensive guide should give you solid understanding of Kubernetes scheduling constraints for your CKA exam preparation!
+
