@@ -104,6 +104,70 @@ NOTES:
    echo "http://$SERVICE_IP/"
 ```
 
+## 🧩 **Standard Helm Install Syntax**
+
+```bash
+helm install <release-name> <chart> [flags]
+```
+
+---
+
+## 📘 **Syntax Explanation**
+
+| Component        | Description                                                                                                                            | Example                                                                 |
+| ---------------- | -------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
+| `helm`           | The Helm CLI command itself                                                                                                            | —                                                                       |
+| `install`        | Subcommand used to deploy (install) a Helm chart                                                                                       | —                                                                       |
+| `<release-name>` | A name you assign to this deployment. It uniquely identifies this release within the namespace.                                        | `my-nginx`                                                              |
+| `<chart>`        | The chart to install — can be a chart reference (`repo/chart-name`), a local chart directory (`./mychart`), or a `.tgz` chart package. | `bitnami/nginx`                                                         |
+| `[flags]`        | Optional parameters to customize the installation.                                                                                     | `--namespace`, `--set`, `--values`, `--atomic`, `--generate-name`, etc. |
+
+---
+
+## 💡 **Example (Your Command)**
+
+```bash
+helm install my-nginx bitnami/nginx
+```
+
+### Breakdown:
+
+| Part              | Meaning                                                         |
+| ----------------- | --------------------------------------------------------------- |
+| `helm`            | Invokes Helm CLI                                                |
+| `install`         | Tells Helm to install a chart                                   |
+| `my-nginx`        | Your chosen **release name**                                    |
+| `bitnami/nginx`   | The **chart reference** from the Bitnami repository             |
+| *(no flags used)* | Means it uses **default values** from the chart’s `values.yaml` |
+
+---
+
+## ⚙️ **More Examples with Flags**
+
+| Command                                                               | Description                                        |
+| --------------------------------------------------------------------- | -------------------------------------------------- |
+| `helm install my-nginx bitnami/nginx --namespace web`                 | Installs in a specific namespace (`web`)           |
+| `helm install my-nginx bitnami/nginx --set service.type=LoadBalancer` | Overrides default chart values inline              |
+| `helm install my-nginx bitnami/nginx -f custom-values.yaml`           | Installs using your custom `values.yaml`           |
+| `helm install --generate-name bitnami/nginx`                          | Automatically generates a random release name      |
+| `helm install my-nginx bitnami/nginx --atomic`                        | Rolls back automatically if the installation fails |
+
+---
+
+## 📋 **Quick Syntax Reference Summary**
+
+| Element            | Required | Description                             | Example                  |
+| ------------------ | -------- | --------------------------------------- | ------------------------ |
+| `<release-name>`   | ✅        | Custom name for your release            | `my-nginx`               |
+| `<chart>`          | ✅        | Chart source (repo/chart, dir, or .tgz) | `bitnami/nginx`          |
+| `--namespace`      | ❌        | Kubernetes namespace to deploy into     | `--namespace web`        |
+| `--set`            | ❌        | Inline variable override                | `--set image.tag=latest` |
+| `-f` or `--values` | ❌        | Specify custom values file              | `-f myvalues.yaml`       |
+| `--version`        | ❌        | Specify chart version                   | `--version 15.9.2`       |
+| `--atomic`         | ❌        | Rollback if install fails               | `--atomic`               |
+| `--generate-name`  | ❌        | Auto-generate release name              | `--generate-name`        |
+
+
 ---
 
 ### **Step 5: Verify Installation**
