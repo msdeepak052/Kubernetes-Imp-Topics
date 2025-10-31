@@ -177,6 +177,9 @@ Confirm rollback:
 helm history my-nginx
 ```
 
+<img width="1293" height="264" alt="image" src="https://github.com/user-attachments/assets/0404a81b-718e-4b97-a8f4-f2ede5c651fc" />
+
+
 ---
 
 ## 📋 **Quick Syntax Reference**
