@@ -128,6 +128,7 @@ You’ll still see Helm release metadata (depending on your storage driver).
 If you reinstall the same release, Helm reuses and increments the revision:
 
 ```bash
+kubectl delete secret sh.helm.release.v1.my-nginx.v1 -n default
 helm install my-nginx bitnami/nginx
 ```
 
