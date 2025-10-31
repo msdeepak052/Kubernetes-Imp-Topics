@@ -78,10 +78,10 @@ bitnami/nginx   	15.7.0       	1.25.1     	NGINX Open Source...
 
 ### **Step 2: Install a Specific Chart Version**
 
-Let’s install **version 15.8.0** of the NGINX chart.
+Let’s install **version 22.1.1** of the NGINX chart.
 
 ```bash
-helm install my-nginx bitnami/nginx --version 15.8.0
+helm install my-nginx bitnami/nginx --version 22.1.1
 ```
 
 ✅ **Expected Output:**
@@ -92,7 +92,7 @@ LAST DEPLOYED: Fri Oct 31 19:50:43 2025
 NAMESPACE: default
 STATUS: deployed
 REVISION: 1
-CHART: nginx-15.8.0
+CHART: nginx-22.1.1
 ```
 
 Verify installed release:
@@ -105,7 +105,7 @@ helm list
 
 ```
 NAME      	NAMESPACE	REVISION	CHART       	APP VERSION	STATUS
-my-nginx  	default  	1       	nginx-15.8.0	1.25.2     	deployed
+my-nginx  	default  	1       	nginx-22.1.1	1.25.2     	deployed
 ```
 
 ---
@@ -115,7 +115,7 @@ my-nginx  	default  	1       	nginx-15.8.0	1.25.2     	deployed
 Now upgrade to the latest version (for example **15.9.2**):
 
 ```bash
-helm upgrade my-nginx bitnami/nginx --version 15.9.2
+helm upgrade my-nginx bitnami/nginx --version 22.2.3
 ```
 
 ✅ **Expected Output:**
@@ -127,7 +127,7 @@ LAST DEPLOYED: Fri Oct 31 20:00:10 2025
 NAMESPACE: default
 STATUS: deployed
 REVISION: 2
-CHART: nginx-15.9.2
+CHART: nginx-22.2.3
 ```
 
 ---
@@ -144,8 +144,8 @@ helm history my-nginx
 
 ```
 REVISION	UPDATED                 	STATUS    	CHART       	APP VERSION	DESCRIPTION
-1       	Fri Oct 31 19:50:43 2025	deployed  	nginx-15.8.0	1.25.2     	Install complete
-2       	Fri Oct 31 20:00:10 2025	deployed  	nginx-15.9.2	1.25.3     	Upgrade complete
+1       	Fri Oct 31 19:50:43 2025	deployed  	nginx-22.1.1	1.25.2     	Install complete
+2       	Fri Oct 31 20:00:10 2025	deployed  	nginx-22.2.3	1.25.3     	Upgrade complete
 ```
 
 Check Kubernetes objects:
