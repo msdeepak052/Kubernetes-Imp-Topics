@@ -147,8 +147,8 @@ These commands retrieve that information easily:
 
 | Command                                | Description                                |
 | -------------------------------------- | ------------------------------------------ |
-| `helm get all my-nginx -n demo09`      | Shows all stored info about the release    |
-| `helm get values my-nginx -n demo09`   | Shows merged values used in deployment     |
+| ```bash helm get all my-nginx -n demo09 ```      | Shows all stored info about the release    |
+| `helm get values my-nginx -n demo09 or helm get values my-nginx -n demo09 --all`   | Shows merged values used in deployment     |
 | `helm get manifest my-nginx -n demo09` | Shows final rendered Kubernetes manifests  |
 | `helm get notes my-nginx -n demo09`    | Shows post-installation notes/instructions |
 | `helm get hooks my-nginx -n demo09`    | Displays lifecycle hooks (if any)          |
@@ -157,6 +157,35 @@ Example:
 
 ```bash
 helm get values my-nginx -n demo09
+```
+### ✅ Correct Usage
+
+If you want to see:
+
+#### 1️⃣ **Values used in your deployed release (in namespace demo09):**
+
+```bash
+helm get values my-nginx -n demo09
+```
+
+(You already did this — it shows only user-supplied values.)
+
+#### 2️⃣ **Full values including defaults (from the chart + overrides):**
+
+```bash
+helm get values my-nginx -n demo09 --all
+```
+
+#### 3️⃣ **Default values of the chart (not your release):**
+
+```bash
+helm show values nginx
+```
+
+or (if you installed from Bitnami repo)
+
+```bash
+helm show values bitnami/nginx
 ```
 
 ---
