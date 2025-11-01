@@ -108,7 +108,7 @@ kind: Deployment
 metadata:
   name: {{ include "builtins.name" . }}
   labels:
-    {{ include "builtins.labels" . | indent 4 }}
+{{ include "builtins.labels" . | indent 4 }}
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
@@ -146,7 +146,7 @@ kind: Service
 metadata:
   name: {{ include "builtins.name" . }}-svc
   labels:
-    {{ include "builtins.labels" . | indent 4 }}
+{{ include "builtins.labels" . | indent 4 }}
 spec:
   type: {{ .Values.service.type }}
   ports:
