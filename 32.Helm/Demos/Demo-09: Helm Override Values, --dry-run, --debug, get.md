@@ -147,7 +147,7 @@ These commands retrieve that information easily:
 
 | Command                                | Description                                |
 | -------------------------------------- | ------------------------------------------ |
-| ```bash helm get all my-nginx -n demo09 ```      | Shows all stored info about the release    |
+| `helm get all my-nginx -n demo09`      | Shows all stored info about the release    |
 | `helm get values my-nginx -n demo09 or helm get values my-nginx -n demo09 --all`   | Shows merged values used in deployment     |
 | `helm get manifest my-nginx -n demo09` | Shows final rendered Kubernetes manifests  |
 | `helm get notes my-nginx -n demo09`    | Shows post-installation notes/instructions |
