@@ -102,7 +102,7 @@ app.kubernetes.io/version: {{ .Chart.AppVersion }}
 
 ### `demo-11-builtins/mychart/templates/deployment.yaml`
 
-```gotemplate
+```yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -140,7 +140,7 @@ spec:
 
 ### `demo-11-builtins/mychart/templates/service.yaml`
 
-```gotemplate
+```yaml
 apiVersion: v1
 kind: Service
 metadata:
@@ -162,7 +162,7 @@ spec:
 
 ### `demo-11-builtins/mychart/templates/configmap-from-file.yaml`
 
-```gotemplate
+```yaml
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -183,7 +183,7 @@ data:
 
 ### `demo-11-builtins/mychart/templates/capability-check.yaml`
 
-```gotemplate
+```yaml
 {{- /*
 This manifest is rendered only if the cluster supports the apps/v1 API (practical example).
 */ -}}
@@ -206,7 +206,7 @@ data:
 
 ### `demo-11-builtins/mychart/templates/hook-job.yaml`
 
-```gotemplate
+```yaml
 {{- /*
 A simple Job that runs during post-install as a hook.
 It demonstrates .Release.IsInstall and hook annotations.
