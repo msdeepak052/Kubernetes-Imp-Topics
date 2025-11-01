@@ -168,8 +168,6 @@ If you want to see:
 helm get values my-nginx -n demo09
 ```
 
-(You already did this — it shows only user-supplied values.)
-
 #### 2️⃣ **Full values including defaults (from the chart + overrides):**
 
 ```bash
@@ -179,7 +177,7 @@ helm get values my-nginx -n demo09 --all
 #### 3️⃣ **Default values of the chart (not your release):**
 
 ```bash
-helm show values nginx
+helm show values bitnami/nginx
 ```
 
 or (if you installed from Bitnami repo)
