@@ -115,7 +115,7 @@ service:
 
 This file demonstrates the **`if`, `else if`, and `eq` functions**.
 
-```gotemplate
+```yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -174,7 +174,7 @@ spec:
 
 Conditional Service rendering using `if .Values.exposeService`.
 
-```gotemplate
+```yaml
 {{- if .Values.exposeService }}
 apiVersion: v1
 kind: Service
