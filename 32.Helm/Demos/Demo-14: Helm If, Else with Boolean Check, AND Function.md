@@ -101,7 +101,7 @@ service:
 
 ### **templates/_helpers.tpl**
 
-```gotemplate
+```yaml
 {{- define "webchart.fullname" -}}
 {{ printf "%s-%s" .Release.Name .Chart.Name | trunc 63 | trimSuffix "-" }}
 {{- end -}}
@@ -113,7 +113,7 @@ service:
 
 ### **templates/deployment.yaml**
 
-```gotemplate
+```yaml
 {{- if and .Values.enableDeployment (eq .Values.env "prod") }}
 apiVersion: apps/v1
 kind: Deployment
@@ -165,7 +165,7 @@ spec:
 
 ### **templates/service.yaml**
 
-```gotemplate
+```yaml
 {{- if and .Values.enableService .Values.enableDeployment }}
 apiVersion: v1
 kind: Service
@@ -189,7 +189,7 @@ spec:
 
 ### **templates/configmap.yaml**
 
-```gotemplate
+```yaml
 apiVersion: v1
 kind: ConfigMap
 metadata:
