@@ -73,6 +73,17 @@ data:
   message: "No app configuration found!"
   {{- end }}
 ```
+### 🧠 Structure breakdown (indentation helps visualize logic)
+with .Values.app          ← starts the outer block
+│
+├── if .enabled           ← starts the inner conditional
+│   ├── message when enabled
+│   └── else → message when disabled
+│   end                   ← closes inner if
+│
+└── else                  ← outer else (if no .Values.app at all)
+end                       ← closes outer with
+
 
 ---
 
