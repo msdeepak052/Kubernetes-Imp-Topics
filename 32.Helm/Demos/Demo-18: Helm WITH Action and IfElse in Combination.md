@@ -74,6 +74,7 @@ data:
   {{- end }}
 ```
 ### 🧠 Structure breakdown (indentation helps visualize logic)
+```
 with .Values.app          ← starts the outer block
 │
 ├── if .enabled           ← starts the inner conditional
@@ -83,8 +84,7 @@ with .Values.app          ← starts the outer block
 │
 └── else                  ← outer else (if no .Values.app at all)
 end                       ← closes outer with
-
-
+```
 ---
 
 ## 🧠 **Step 5: Explanation**
