@@ -202,21 +202,22 @@ If `.Values.exposeService` = `false`, Helm **skips** creating a Service manifest
 
 We’ll also show inline `if` inside data fields.
 
-```gotemplate
+```yaml
 apiVersion: v1
 kind: ConfigMap
 metadata:
   name: {{ include "webchart.fullname" . }}-config
 data:
   message: |
-    {{- if eq .Values.serverType "nginx" -}}
+    {{- if eq .Values.serverType "nginx" }}
     Running NGINX web server
-    {{- else if eq .Values.serverType "apache" -}}
+    {{- else if eq .Values.serverType "apache" }}
     Running APACHE web server
-    {{- else -}}
+    {{- else }}
     Running default BusyBox server
     {{- end }}
   envType: "{{ .Values.env }}"
+
 ```
 
 ---
