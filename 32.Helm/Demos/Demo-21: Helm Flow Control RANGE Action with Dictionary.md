@@ -114,7 +114,7 @@ userDetails:
   name: Deepak
   role: DevOps Engineer
   location: Bangalore
-  company: Temenos
+  company: XYZ
 ```
 
 ---
@@ -177,7 +177,7 @@ data:
     name: Deepak
     role: DevOps Engineer
     location: Bangalore
-    company: Temenos
+    company: XYZ
 ```
 
 ---
