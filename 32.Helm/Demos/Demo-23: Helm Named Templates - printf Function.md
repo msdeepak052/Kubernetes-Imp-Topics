@@ -285,13 +285,13 @@ This structure demonstrates **printf inside named templates** to dynamically for
 
 ## ✅ Summary Table
 
-| Concept   | Description                        | Example                            |            |
-| --------- | ---------------------------------- | ---------------------------------- | ---------- |
-| `printf`  | Formats and joins multiple strings | `printf "%s-%s" "frontend" "prod"` |            |
-| `include` | Calls another template             | `include "demo23.app.name" .`      |            |
-| `nindent` | Maintains indentation              | `                                  | nindent 4` |
-| `define`  | Creates reusable template          | `define "demo23.fullname"`         |            |
-| `quote`   | Wraps values in quotes             | `                                  | quote`     |
+| Concept   | Description                        | Example                            |
+| ---------- | ---------------------------------- | ---------------------------------- |
+| `printf`  | Formats and joins multiple strings | `printf "%s-%s" "frontend" "prod"` |
+| `include` | Calls another template             | `include "demo23.app.name" .`      |
+| `nindent` | Maintains indentation              | `{{ .Value \| nindent 4 }}`        |
+| `define`  | Creates reusable template          | `{{- define "demo23.fullname" -}}` |
+| `quote`   | Wraps values in quotes             | `{{ .Value \| quote }}`            |
 
 ---
 
