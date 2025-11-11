@@ -1,4 +1,4 @@
-
+# EKS creation using eksctl
 
 ### 🧾 Command
 
@@ -81,6 +81,62 @@ kubectl get nodes
 | `--appmesh-access`          | Optional, enables AWS App Mesh (if needed)                                |
 
 ---
+
+> here’s the exact command to **delete an EKS cluster** using `eksctl`:
+
+---
+
+### 🧾 Command
+
+```bash
+eksctl delete cluster --name deepak-private-eks --region ap-south-1
+```
+
+---
+
+### ⚙️ Explanation
+
+| Option                      | Description                                  |
+| --------------------------- | -------------------------------------------- |
+| `--name deepak-private-eks` | The name of your EKS cluster                 |
+| `--region ap-south-1`       | The AWS region where the cluster was created |
+
+---
+
+### 🧹 What This Does
+
+* Deletes the **EKS control plane**
+* Deletes **nodegroups** and **EC2 instances**
+* Deletes the **VPC** and all **subnets, route tables, security groups**, etc. (if `eksctl` created them)
+* Cleans up all **CloudFormation stacks** associated with that cluster
+
+---
+
+### ⚠️ Important Notes
+
+* If you created the **VPC manually** (not by `eksctl`), it won’t be deleted automatically.
+* You can check progress via CloudFormation:
+
+  ```
+  aws cloudformation list-stacks --region ap-south-1
+  ```
+* If you want to delete **only the nodegroup** (keep cluster), you can use:
+
+  ```bash
+  eksctl delete nodegroup --cluster deepak-private-eks --name private-ng --region ap-south-1
+  ```
+
+---
+
+✅ **Summary:**
+For full cleanup:
+
+```bash
+eksctl delete cluster --name deepak-private-eks --region ap-south-1
+```
+
+
+
 
 ### 🧠 Notes
 
