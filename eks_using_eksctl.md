@@ -101,4 +101,89 @@ kubectl get nodes
 
 ---
 
+You can confirm whether the **AWS Load Balancer Controller** is successfully installed in your EKS cluster using the following steps 👇
+
+---
+
+### 🧩 Step 1: Check Helm Release
+
+```bash
+helm list -n kube-system
+```
+
+✅ You should see an entry like:
+
+```
+NAME                            NAMESPACE    REVISION    STATUS     CHART                            APP VERSION
+aws-load-balancer-controller    kube-system  1            deployed   aws-load-balancer-controller-x.y.z  v2.x.x
+```
+
+If the `STATUS` is `deployed`, Helm installed it successfully.
+
+---
+
+### 🧩 Step 2: Verify Deployment in Kubernetes
+
+```bash
+kubectl get deployment -n kube-system aws-load-balancer-controller
+```
+
+✅ Expected output:
+
+```
+NAME                           READY   UP-TO-DATE   AVAILABLE   AGE
+aws-load-balancer-controller   2/2     2            2           3m
+```
+
+Both replicas should be **READY**.
+
+---
+
+### 🧩 Step 3: Check Pods
+
+```bash
+kubectl get pods -n kube-system -l app.kubernetes.io/name=aws-load-balancer-controller
+```
+
+✅ You should see something like:
+
+```
+NAME                                                READY   STATUS    RESTARTS   AGE
+aws-load-balancer-controller-7d9c96b4df-5pghx       1/1     Running   0          2m
+aws-load-balancer-controller-7d9c96b4df-tz8lw       1/1     Running   0          2m
+```
+
+---
+
+### 🧩 Step 4: (Optional) Check Logs for Confirmation
+
+```bash
+kubectl logs -n kube-system -l app.kubernetes.io/name=aws-load-balancer-controller
+```
+
+✅ Look for a message like:
+
+```
+Successfully started AWS Load Balancer Controller
+```
+
+---
+
+### ✅ Bonus Check (verify CRDs are installed)
+
+```bash
+kubectl get crds | grep ingress
+```
+
+You should see CRDs such as:
+
+```
+ingressclassparams.elbv2.k8s.aws
+targetgroupbindings.elbv2.k8s.aws
+```
+
+---
+
+
+
 
