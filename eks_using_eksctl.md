@@ -302,6 +302,9 @@ kubectl logs -n kube-system -l app.kubernetes.io/name=aws-ebs-csi-driver
 ```
 Successfully started AWS EBS CSI Driver
 ```
+kubectl get storageclass
+kubectl patch storageclass gp2 -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'
+
 
 ---
 ## Troubleshooting steps
