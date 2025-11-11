@@ -93,11 +93,16 @@ kubectl get nodes
   helm install aws-load-balancer-controller eks/aws-load-balancer-controller \
     -n kube-system \
     --set clusterName=deepak-private-eks \
-    --set serviceAccount.create=false \
     --set region=ap-south-1 \
-    --set vpcId=<your-vpc-id> \
-    --set serviceAccount.name=aws-load-balancer-controller
+    --set vpcId=<your-vpc-id>
+
   ```
+> After either fix, recheck:
+
+kubectl get pods -n kube-system -l app.kubernetes.io/name=aws-load-balancer-controller
+
+
+✅ Expect STATUS to show Running.
 
 ---
 
