@@ -276,7 +276,7 @@ kubectl patch s3bucket my-app-bucket \
 ```
 
 ---
-# **Chronology of Finalizer Deletion - Complete Explanation**
+## **Chronology of Finalizer Deletion - Complete Explanation**
 
 Let me clarify with a **step-by-step chronological example**:
 
