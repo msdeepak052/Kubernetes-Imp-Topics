@@ -103,7 +103,7 @@ nodes:
 ### Create Cluster
 
 ```bash
-kind create cluster --name kind-2node --config kind-nodeport.yaml
+ kind create cluster --name=deepak-kind-cluster --config=kind-2node.yaml
 ```
 
 Verify:
