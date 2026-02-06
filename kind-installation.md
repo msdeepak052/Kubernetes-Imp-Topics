@@ -81,15 +81,23 @@ nano kind-nodeport.yaml
 ```
 
 ```yaml
+
 kind: Cluster
 apiVersion: kind.x-k8s.io/v1alpha4
+
+# Specify the Kubernetes version by using a specific node image
+# Visit https://hub.docker.com/r/kindest/node/tags and https://github.com/kubernetes-sigs/kind/releases for available images
+
 nodes:
-- role: control-plane
-  extraPortMappings:
-  - containerPort: 30080
-    hostPort: 30080
-    protocol: TCP
-- role: worker
+  - role: worker
+  - role: control-plane
+    image: kindest/node:v1.35.0
+    extraPortMappings:
+      - containerPort: 31000 # Port inside the KIND container
+        hostPort: 31000 # Port on your local machine (host system).
+        # If this were set to 9090, you would access the service at localhost:9090,
+        # and traffic would be forwarded to containerPort 31000 inside the KIND cluster
+
 ```
 
 ### Create Cluster
