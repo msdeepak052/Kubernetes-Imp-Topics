@@ -149,7 +149,7 @@ spec:
   ports:
   - port: 80
     targetPort: 80
-    nodePort: 30080
+    nodePort: 31000
 ```
 
 Verify:
@@ -161,7 +161,7 @@ kubectl get svc nginx-service
 Access in browser:
 
 ```
-http://localhost:30080
+http://localhost:31000
 ```
 
 ---
